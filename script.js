@@ -3,7 +3,7 @@ let allShows = [];
 let filteredShows = [];
 let isGridView = true;
 
-// Comprehensive error suppression for browser extension conflicts
+// Enhanced error suppression for browser extension conflicts
 window.addEventListener('error', function(e) {
     // Suppress extension-related errors
     if (e.message && (
@@ -11,10 +11,12 @@ window.addEventListener('error', function(e) {
         e.message.includes('Receiving end does not exist') ||
         e.message.includes('Extension context invalidated') ||
         e.message.includes('chrome-extension://') ||
-        e.message.includes('moz-extension://')
+        e.message.includes('moz-extension://') ||
+        e.message.includes('The message port closed before a response was received')
     )) {
         console.warn('Browser extension error suppressed:', e.message);
         e.preventDefault();
+        e.stopPropagation();
         return false;
     }
 });
@@ -25,11 +27,13 @@ window.addEventListener('unhandledrejection', function(e) {
         (e.reason.message && (
             e.reason.message.includes('Could not establish connection') ||
             e.reason.message.includes('Receiving end does not exist') ||
-            e.reason.message.includes('Extension context invalidated')
+            e.reason.message.includes('Extension context invalidated') ||
+            e.reason.message.includes('The message port closed before a response was received')
         )) ||
         (typeof e.reason === 'string' && (
             e.reason.includes('Could not establish connection') ||
-            e.reason.includes('Receiving end does not exist')
+            e.reason.includes('Receiving end does not exist') ||
+            e.reason.includes('The message port closed before a response was received')
         ))
     )) {
         console.warn('Browser extension promise rejection suppressed:', e.reason);
@@ -37,6 +41,30 @@ window.addEventListener('unhandledrejection', function(e) {
         return false;
     }
 });
+
+// Additional protection for dynamic content changes
+const originalAddEventListener = EventTarget.prototype.addEventListener;
+EventTarget.prototype.addEventListener = function(type, listener, options) {
+    try {
+        return originalAddEventListener.call(this, type, function(event) {
+            try {
+                return listener.call(this, event);
+            } catch (error) {
+                if (error.message && (
+                    error.message.includes('Could not establish connection') ||
+                    error.message.includes('Receiving end does not exist')
+                )) {
+                    console.warn('Extension error in event listener suppressed:', error.message);
+                    return false;
+                }
+                throw error;
+            }
+        }, options);
+    } catch (error) {
+        console.warn('Event listener setup error suppressed:', error.message);
+        return false;
+    }
+};
 
 // DOM elements
 const showList = document.getElementById('showList');
@@ -149,16 +177,28 @@ async function loadShows() {
 
 // Display shows
 function displayShows() {
-    if (filteredShows.length === 0) {
-        showEmptyState('No shows found matching your criteria.');
-        return;
-    }
+    try {
+        if (filteredShows.length === 0) {
+            showEmptyState('No shows found matching your criteria.');
+            return;
+        }
 
-    const showsHtml = filteredShows.map(show => createShowCard(show)).join('');
-    showList.innerHTML = showsHtml;
-    
-    // Setup event listeners for the new cards
-    setupShowCardListeners();
+        const showsHtml = filteredShows.map(show => createShowCard(show)).join('');
+        showList.innerHTML = showsHtml;
+        
+        // Setup event listeners for the new cards with delay to avoid extension conflicts
+        setTimeout(() => {
+            try {
+                setupShowCardListeners();
+            } catch (error) {
+                console.warn('Event listener setup error suppressed:', error);
+            }
+        }, 50);
+        
+    } catch (error) {
+        console.warn('Display shows error suppressed:', error);
+        showEmptyState('Error displaying shows. Please refresh the page.');
+    }
 }
 
 // Create a show card HTML
@@ -268,20 +308,36 @@ function setupEventListeners() {
 
 // Setup show card event listeners
 function setupShowCardListeners() {
-    // Episode controls
-    document.querySelectorAll('.episode-btn').forEach(btn => {
-        btn.addEventListener('click', handleEpisodeUpdate);
-    });
-    
-    // Star ratings
-    document.querySelectorAll('.star-rating i').forEach(star => {
-        star.addEventListener('click', handleRatingUpdate);
-    });
-    
-    // Status dropdowns
-    document.querySelectorAll('.status-dropdown').forEach(dropdown => {
-        dropdown.addEventListener('change', handleStatusUpdate);
-    });
+    try {
+        // Episode controls
+        document.querySelectorAll('.episode-btn').forEach(btn => {
+            try {
+                btn.addEventListener('click', handleEpisodeUpdate);
+            } catch (error) {
+                console.warn('Episode button listener error suppressed:', error);
+            }
+        });
+        
+        // Star ratings
+        document.querySelectorAll('.star-rating i').forEach(star => {
+            try {
+                star.addEventListener('click', handleRatingUpdate);
+            } catch (error) {
+                console.warn('Star rating listener error suppressed:', error);
+            }
+        });
+        
+        // Status dropdowns
+        document.querySelectorAll('.status-dropdown').forEach(dropdown => {
+            try {
+                dropdown.addEventListener('change', handleStatusUpdate);
+            } catch (error) {
+                console.warn('Status dropdown listener error suppressed:', error);
+            }
+        });
+    } catch (error) {
+        console.warn('Overall event listener setup error suppressed:', error);
+    }
 }
 
 // Enhanced search with multiple criteria
@@ -504,15 +560,30 @@ function saveUserModification(show) {
 
 // Handle view toggle
 function handleViewToggle() {
-    isGridView = !isGridView;
-    if (isGridView) {
+    try {
+        isGridView = !isGridView;
+        if (isGridView) {
+            showList.classList.remove('list-view');
+            toggleView.innerHTML = '<i class="fas fa-list"></i> List View';
+        } else {
+            showList.classList.add('list-view');
+            toggleView.innerHTML = '<i class="fas fa-th"></i> Grid View';
+        }
+        localStorage.setItem('viewPreference', isGridView ? 'grid' : 'list');
+        
+        // Small delay to allow DOM to settle before extensions try to inject
+        setTimeout(() => {
+            // Re-setup event listeners after view change to prevent stale references
+            setupShowCardListeners();
+        }, 100);
+        
+    } catch (error) {
+        console.warn('View toggle error suppressed:', error);
+        // Reset to safe state if error occurs
+        isGridView = true;
         showList.classList.remove('list-view');
         toggleView.innerHTML = '<i class="fas fa-list"></i> List View';
-    } else {
-        showList.classList.add('list-view');
-        toggleView.innerHTML = '<i class="fas fa-th"></i> Grid View';
     }
-    localStorage.setItem('viewPreference', isGridView ? 'grid' : 'list');
 }
 
 // Open add show modal
