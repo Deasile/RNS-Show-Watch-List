@@ -177,7 +177,10 @@ function createShowCard(show) {
             <div class="show-header">
                 <div class="show-title">${escapeHtml(show.name)}</div>
                 <div class="show-status-container">
-                    <select class="status-dropdown" data-show-id="${show.id}">
+                    <select class="status-dropdown" 
+                            id="status-dropdown-${show.id}" 
+                            name="status-dropdown-${show.id}" 
+                            data-show-id="${show.id}">
                         <option value="Watching" ${show.status === 'Watching' ? 'selected' : ''}>Watching</option>
                         <option value="Completed" ${show.status === 'Completed' ? 'selected' : ''}>Completed</option>
                         <option value="Planned" ${show.status === 'Planned' ? 'selected' : ''}>Planned</option>
