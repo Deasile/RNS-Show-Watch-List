@@ -141,7 +141,18 @@ function createShowCard(show) {
         <div class="show-card" data-id="${show.id}">
             <div class="show-header">
                 <div class="show-title">${escapeHtml(show.name)}</div>
-                <div class="show-status ${statusClass}">${escapeHtml(show.status)}</div>
+                <div class="show-status-container">
+                    <select class="status-dropdown" data-show-id="${show.id}">
+                        <option value="Watching" ${show.status === 'Watching' ? 'selected' : ''}>Watching</option>
+                        <option value="Completed" ${show.status === 'Completed' ? 'selected' : ''}>Completed</option>
+                        <option value="Planned" ${show.status === 'Planned' ? 'selected' : ''}>Planned</option>
+                        <option value="On Hold" ${show.status === 'On Hold' ? 'selected' : ''}>On Hold</option>
+                        <option value="Dropped" ${show.status === 'Dropped' ? 'selected' : ''}>Dropped</option>
+                        <option value="Adult" ${show.status === 'Adult' ? 'selected' : ''}>Adult</option>
+                        <option value="Check Later" ${show.status === 'Check Later' ? 'selected' : ''}>Check Later</option>
+                    </select>
+                    <div class="show-status ${statusClass}">${escapeHtml(show.status)}</div>
+                </div>
             </div>
             <div class="show-body">
                 <div class="show-progress">
@@ -221,6 +232,11 @@ function setupShowCardListeners() {
     // Star ratings
     document.querySelectorAll('.star-rating i').forEach(star => {
         star.addEventListener('click', handleRatingUpdate);
+    });
+    
+    // Status dropdowns
+    document.querySelectorAll('.status-dropdown').forEach(dropdown => {
+        dropdown.addEventListener('change', handleStatusUpdate);
     });
 }
 
@@ -384,6 +400,33 @@ function handleRatingUpdate(event) {
     
     saveUserModification(show);
     displayShows();
+}
+
+// Handle status updates
+function handleStatusUpdate(e) {
+    const dropdown = e.target;
+    const showCard = dropdown.closest('.show-card');
+    const showId = parseInt(showCard.dataset.showId);
+    const newStatus = dropdown.value;
+    
+    // Find the show in our data
+    const show = allShows.find(s => s.id === showId);
+    if (show) {
+        // Update the data
+        show.status = newStatus;
+        
+        // Save modifications
+        saveUserModification(show);
+        
+        // Update the show card styling to reflect new status
+        showCard.className = `show-card status-${newStatus.toLowerCase().replace(/[^a-z0-9]/g, '-')}`;
+        
+        // Show notification
+        showNotification(`Updated "${show.show}" status to "${newStatus}"`);
+        
+        // Refresh display to update analytics
+        displayShows();
+    }
 }
 
 // Save user modification to localStorage
