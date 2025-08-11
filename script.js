@@ -24,7 +24,49 @@ document.addEventListener('DOMContentLoaded', function() {
     loadShows();
     setupEventListeners();
     loadUserPreferences();
+    setupKeyboardShortcuts();
+    showNotification('Welcome to RNS Show Watch List! 🎬', 'success');
 });
+
+// Setup keyboard shortcuts
+function setupKeyboardShortcuts() {
+    document.addEventListener('keydown', function(event) {
+        // Only trigger if not in an input field
+        if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA') {
+            return;
+        }
+        
+        switch(event.key) {
+            case '/':
+                event.preventDefault();
+                searchInput.focus();
+                break;
+            case 'n':
+                if (event.ctrlKey) {
+                    event.preventDefault();
+                    openAddShowModal();
+                }
+                break;
+            case 'v':
+                event.preventDefault();
+                handleViewToggle();
+                break;
+            case 'r':
+                if (event.ctrlKey) {
+                    event.preventDefault();
+                    location.reload();
+                }
+                break;
+            case 'Escape':
+                closeModal();
+                searchInput.blur();
+                break;
+        }
+    });
+    
+    // Show keyboard shortcuts help
+    createKeyboardShortcutsHelp();
+}
 
 // Load shows from JSON
 async function loadShows() {
@@ -182,12 +224,55 @@ function setupShowCardListeners() {
     });
 }
 
-// Handle search
+// Enhanced search with multiple criteria
 function handleSearch() {
-    const query = searchInput.value.toLowerCase();
-    filteredShows = allShows.filter(show => 
-        show.name.toLowerCase().includes(query)
-    );
+    const query = searchInput.value.toLowerCase().trim();
+    
+    if (!query) {
+        filteredShows = [...allShows];
+        applyFiltersAndSort();
+        return;
+    }
+    
+    filteredShows = allShows.filter(show => {
+        // Multi-field search
+        const searchableText = [
+            show.name,
+            show.status,
+            show.genre || '',
+            show.year || '',
+            show.notes || ''
+        ].join(' ').toLowerCase();
+        
+        // Handle special search operators
+        if (query.startsWith('rating:')) {
+            const rating = parseInt(query.split(':')[1]);
+            return show.rating === rating;
+        }
+        
+        if (query.startsWith('status:')) {
+            const status = query.split(':')[1];
+            return show.status.toLowerCase().includes(status);
+        }
+        
+        if (query.startsWith('progress:')) {
+            const progressOp = query.split(':')[1];
+            const progress = show.total_episodes > 0 ? 
+                Math.round((show.watched_episode / show.total_episodes) * 100) : 0;
+            
+            if (progressOp.startsWith('>')) {
+                return progress > parseInt(progressOp.substring(1));
+            } else if (progressOp.startsWith('<')) {
+                return progress < parseInt(progressOp.substring(1));
+            } else {
+                return progress === parseInt(progressOp);
+            }
+        }
+        
+        // Default text search
+        return searchableText.includes(query);
+    });
+    
     applyFiltersAndSort();
 }
 
@@ -443,18 +528,16 @@ function exportToCsv() {
     linkElement.click();
 }
 
-// Update statistics
+// Enhanced statistics with insights
 function updateStatistics() {
     const total = allShows.length;
     
     // Use exact status matching for accurate statistics
-    const watching = allShows.filter(show => 
-        show.status === 'Watching'
-    ).length;
-    
-    const completed = allShows.filter(show => 
-        show.status === 'Completed'
-    ).length;
+    const watching = allShows.filter(show => show.status === 'Watching').length;
+    const completed = allShows.filter(show => show.status === 'Completed').length;
+    const planned = allShows.filter(show => show.status === 'Planned').length;
+    const onHold = allShows.filter(show => show.status === 'On Hold').length;
+    const dropped = allShows.filter(show => show.status === 'Dropped').length;
     
     // Calculate average progress more accurately
     const showsWithProgress = allShows.filter(show => show.total_episodes > 0);
@@ -467,10 +550,251 @@ function updateStatistics() {
     const avgProgress = showsWithProgress.length > 0 ? 
         Math.round(totalProgress / showsWithProgress.length) : 0;
     
+    // Calculate average rating
+    const ratedShows = allShows.filter(show => show.rating > 0);
+    const totalRating = ratedShows.reduce((sum, show) => sum + show.rating, 0);
+    const avgRating = ratedShows.length > 0 ? 
+        (totalRating / ratedShows.length).toFixed(1) : '0.0';
+    
+    // Estimate total watch time (assuming 24 minutes per episode)
+    const totalEpisodes = allShows.reduce((sum, show) => sum + show.watched_episode, 0);
+    const totalMinutes = totalEpisodes * 24;
+    const totalHours = Math.round(totalMinutes / 60);
+    
+    // Update UI
     totalShows.textContent = total;
     watchingShows.textContent = watching;
     completedShows.textContent = completed;
     averageProgress.textContent = `${avgProgress}%`;
+    
+    // Update new statistics if elements exist
+    const avgRatingElement = document.getElementById('averageRating');
+    const totalHoursElement = document.getElementById('totalHours');
+    
+    if (avgRatingElement) avgRatingElement.textContent = avgRating;
+    if (totalHoursElement) totalHoursElement.textContent = `${totalHours}h`;
+    
+    // Generate insights
+    generateInsights({
+        total, watching, completed, planned, onHold, dropped,
+        avgProgress, avgRating, totalHours, ratedShows: ratedShows.length
+    });
+}
+
+// Generate intelligent insights
+function generateInsights(stats) {
+    const insights = [];
+    
+    // Completion rate insight
+    const completionRate = stats.total > 0 ? 
+        Math.round((stats.completed / stats.total) * 100) : 0;
+    
+    if (completionRate > 70) {
+        insights.push({
+            icon: 'fas fa-trophy',
+            text: `Great job! You complete ${completionRate}% of shows you start`,
+            type: 'success'
+        });
+    } else if (completionRate < 30) {
+        insights.push({
+            icon: 'fas fa-exclamation-triangle',
+            text: `Only ${completionRate}% completion rate - consider cleaning up your list`,
+            type: 'warning'
+        });
+    }
+    
+    // Backlog insight
+    if (stats.planned > stats.watching * 3) {
+        insights.push({
+            icon: 'fas fa-list',
+            text: `Large backlog detected: ${stats.planned} planned vs ${stats.watching} watching`,
+            type: 'info'
+        });
+    }
+    
+    // Rating insight
+    if (stats.ratedShows / stats.total < 0.5) {
+        insights.push({
+            icon: 'fas fa-star',
+            text: `Rate more shows! Only ${Math.round((stats.ratedShows / stats.total) * 100)}% have ratings`,
+            type: 'tip'
+        });
+    } else if (parseFloat(stats.avgRating) > 4.0) {
+        insights.push({
+            icon: 'fas fa-heart',
+            text: `High standards! Average rating of ${stats.avgRating} stars`,
+            type: 'success'
+        });
+    }
+    
+    // Watch time insight
+    if (stats.totalHours > 100) {
+        const days = Math.round(stats.totalHours / 24);
+        insights.push({
+            icon: 'fas fa-clock',
+            text: `Impressive! You've watched ${days} days worth of content`,
+            type: 'achievement'
+        });
+    }
+    
+    // On hold insight
+    if (stats.onHold > 5) {
+        insights.push({
+            icon: 'fas fa-pause',
+            text: `${stats.onHold} shows on hold - time to revisit some?`,
+            type: 'suggestion'
+        });
+    }
+    
+    // Progress insight
+    if (stats.avgProgress > 80) {
+        insights.push({
+            icon: 'fas fa-forward',
+            text: `You're close to finishing many shows! Average ${stats.avgProgress}% complete`,
+            type: 'motivation'
+        });
+    }
+    
+    // Update insights UI
+    updateInsightsUI(insights);
+}
+
+// Update insights display
+function updateInsightsUI(insights) {
+    const insightsContainer = document.getElementById('insights-content');
+    if (!insightsContainer) return;
+    
+    if (insights.length === 0) {
+        insightsContainer.innerHTML = '<div class="no-insights">No insights available yet - add more data!</div>';
+        return;
+    }
+    
+    const insightsHtml = insights.map(insight => `
+        <div class="insight-card insight-${insight.type}">
+            <i class="${insight.icon}"></i>
+            <span>${insight.text}</span>
+        </div>
+    `).join('');
+    
+    insightsContainer.innerHTML = insightsHtml;
+}
+
+// Create keyboard shortcuts help
+function createKeyboardShortcutsHelp() {
+    const helpButton = document.createElement('button');
+    helpButton.className = 'help-button';
+    helpButton.innerHTML = '<i class="fas fa-keyboard"></i>';
+    helpButton.title = 'Keyboard Shortcuts (?)';
+    helpButton.onclick = showKeyboardShortcuts;
+    
+    document.body.appendChild(helpButton);
+}
+
+// Show keyboard shortcuts modal
+function showKeyboardShortcuts() {
+    const modal = document.createElement('div');
+    modal.className = 'modal keyboard-shortcuts-modal';
+    modal.innerHTML = `
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-keyboard"></i> Keyboard Shortcuts</h2>
+                <span class="close" onclick="this.parentElement.parentElement.parentElement.remove()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="shortcuts-grid">
+                    <div class="shortcut-item">
+                        <kbd>/</kbd>
+                        <span>Focus search</span>
+                    </div>
+                    <div class="shortcut-item">
+                        <kbd>Ctrl</kbd> + <kbd>N</kbd>
+                        <span>Add new show</span>
+                    </div>
+                    <div class="shortcut-item">
+                        <kbd>V</kbd>
+                        <span>Toggle view</span>
+                    </div>
+                    <div class="shortcut-item">
+                        <kbd>Ctrl</kbd> + <kbd>R</kbd>
+                        <span>Refresh</span>
+                    </div>
+                    <div class="shortcut-item">
+                        <kbd>Esc</kbd>
+                        <span>Close modal/clear focus</span>
+                    </div>
+                </div>
+                <div class="search-tips">
+                    <h3>Search Tips</h3>
+                    <div class="tip-item">
+                        <code>rating:5</code> - Shows with 5 stars
+                    </div>
+                    <div class="tip-item">
+                        <code>status:watching</code> - Currently watching
+                    </div>
+                    <div class="tip-item">
+                        <code>progress:>80</code> - Over 80% complete
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    modal.style.display = 'block';
+    
+    // Remove on background click
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            modal.remove();
+        }
+    });
+}
+
+// Enhanced bulk operations
+function addBulkOperations() {
+    const bulkToolbar = document.createElement('div');
+    bulkToolbar.className = 'bulk-toolbar';
+    bulkToolbar.innerHTML = `
+        <div class="bulk-actions">
+            <button class="btn btn-secondary" onclick="selectAllShows()">
+                <i class="fas fa-check-square"></i> Select All
+            </button>
+            <button class="btn btn-secondary" onclick="clearSelection()">
+                <i class="fas fa-square"></i> Clear Selection
+            </button>
+            <button class="btn btn-primary" onclick="bulkStatusUpdate()">
+                <i class="fas fa-edit"></i> Bulk Status Update
+            </button>
+            <button class="btn btn-danger" onclick="bulkDelete()">
+                <i class="fas fa-trash"></i> Delete Selected
+            </button>
+        </div>
+        <div class="selection-info">
+            <span id="selection-count">0 selected</span>
+        </div>
+    `;
+    
+    const container = document.querySelector('.container');
+    container.insertBefore(bulkToolbar, document.getElementById('showList'));
+}
+
+// Progress tracking enhancements
+function trackWatchTime() {
+    const watchSessions = JSON.parse(localStorage.getItem('watchSessions') || '[]');
+    const today = new Date().toISOString().split('T')[0];
+    
+    // Add today's session if not exists
+    if (!watchSessions.find(session => session.date === today)) {
+        watchSessions.push({
+            date: today,
+            episodesWatched: 0,
+            timeSpent: 0
+        });
+    }
+    
+    // Save and return current session
+    localStorage.setItem('watchSessions', JSON.stringify(watchSessions));
+    return watchSessions[watchSessions.length - 1];
 }
 
 // Load user preferences

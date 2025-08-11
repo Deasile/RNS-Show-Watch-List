@@ -1,0 +1,55 @@
+{
+  "generated_at": "2025-08-11T07:15:40.059683",
+  "total_shows": 71,
+  "viewing_patterns": {
+    "status_distribution": {
+      "Watching": 42,
+      "Planned": 8,
+      "On Hold": 6,
+      "Dropped": 3,
+      "Adult": 5,
+      "Check Later": 6,
+      "Completed": 1
+    },
+    "average_progress": 2.93,
+    "median_progress": 0.0,
+    "progress_std": 14.91,
+    "completion_rate": 33.3,
+    "average_episodes_per_show": 12.6,
+    "total_watch_time_hours": 14.8,
+    "total_watch_time_days": 0.6
+  },
+  "rating_analysis": {
+    "distribution": {
+      "4": 1,
+      "3": 1,
+      "5": 1
+    },
+    "average": 4,
+    "median": 4,
+    "most_common": 4,
+    "high_rated_count": 2,
+    "high_rated_percentage": 66.7,
+    "by_status": {
+      "Watching": 3.5,
+      "Completed": 5
+    }
+  },
+  "patterns": [
+    {
+      "type": "completion_issue",
+      "title": "Low completion rate",
+      "description": "Only 1/71 shows completed",
+      "suggestion": "Consider being more selective with new shows"
+    }
+  ],
+  "recommendations": [
+    "Be more selective when adding new shows to improve completion rate"
+  ],
+  "insights": [
+    {
+      "type": "data_quality",
+      "message": "68 shows need ratings for better recommendations"
+    }
+  ]
+}
