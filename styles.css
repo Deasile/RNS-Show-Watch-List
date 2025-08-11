@@ -881,7 +881,8 @@ body {
     margin-bottom: 20px;
 }
 
-.form-group label {
+.form-group label,
+.form-group .form-label {
     display: block;
     margin-bottom: 8px;
     font-weight: 600;
