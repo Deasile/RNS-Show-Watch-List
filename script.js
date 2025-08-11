@@ -344,6 +344,93 @@ function displayShows() {
 }
 
 // Create a show card HTML
+// 🔍 DIAGNOSTIC ERROR TRACKING - Specifically for show interactions
+let diagnosticLog = [];
+let diagnosticMode = window.location.search.includes('diagnostic=true');
+
+function logDiagnostic(action, showId, error = null) {
+    const entry = {
+        timestamp: new Date().toISOString(),
+        action: action,
+        showId: showId,
+        error: error ? error.toString() : null,
+        stack: error ? error.stack : null
+    };
+    
+    diagnosticLog.push(entry);
+    
+    if (diagnosticMode) {
+        console.log(`🔍 DIAGNOSTIC [${action}]:`, entry);
+    }
+    
+    // Keep only last 100 entries
+    if (diagnosticLog.length > 100) {
+        diagnosticLog = diagnosticLog.slice(-100);
+    }
+}
+
+function wrapShowFunction(fn, functionName) {
+    return function(...args) {
+        const showId = args[0] && args[0].id ? args[0].id : (args[0] || 'unknown');
+        
+        try {
+            logDiagnostic(`${functionName}_start`, showId);
+            const result = fn.apply(this, args);
+            
+            // If result is a promise, wrap it
+            if (result && typeof result.then === 'function') {
+                return result.then(
+                    (value) => {
+                        logDiagnostic(`${functionName}_success`, showId);
+                        return value;
+                    },
+                    (error) => {
+                        logDiagnostic(`${functionName}_error`, showId, error);
+                        console.error(`🚨 SHOW INTERACTION ERROR in ${functionName}:`, error);
+                        throw error;
+                    }
+                );
+            } else {
+                logDiagnostic(`${functionName}_success`, showId);
+                return result;
+            }
+        } catch (error) {
+            logDiagnostic(`${functionName}_error`, showId, error);
+            console.error(`🚨 SHOW INTERACTION ERROR in ${functionName}:`, error);
+            throw error;
+        }
+    };
+}
+
+// Enhanced error monitoring specifically for extension communication
+function monitorExtensionErrors() {
+    const originalAddEventListener = EventTarget.prototype.addEventListener;
+    
+    EventTarget.prototype.addEventListener = function(type, listener, options) {
+        if (typeof listener === 'function') {
+            const wrappedListener = function(event) {
+                try {
+                    return listener.call(this, event);
+                } catch (error) {
+                    if (error.message && error.message.includes('Could not establish connection')) {
+                        console.warn('🛡️ INTERCEPTED extension error in event listener:', error.message);
+                        logDiagnostic('extension_error_intercepted', 'event_listener', error);
+                    } else {
+                        throw error;
+                    }
+                }
+            };
+            
+            return originalAddEventListener.call(this, type, wrappedListener, options);
+        }
+        
+        return originalAddEventListener.call(this, type, listener, options);
+    };
+}
+
+// Initialize diagnostic monitoring
+monitorExtensionErrors();
+
 function createShowCard(show) {
     const statusClass = `status-${show.status.toLowerCase().replace(/\s+/g, '-')}`;
     const progressPercentage = show.total_episodes > 0 ? 
@@ -448,36 +535,95 @@ function setupEventListeners() {
     });
 }
 
-// Setup show card event listeners
+// Setup show card event listeners with enhanced diagnostic tracking
 function setupShowCardListeners() {
+    logDiagnostic('setupShowCardListeners_start', 'all');
+    
     try {
-        // Episode controls
+        // Episode controls with diagnostic wrapping
         document.querySelectorAll('.episode-btn').forEach(btn => {
             try {
-                btn.addEventListener('click', handleEpisodeUpdate);
+                const wrappedHandler = function(event) {
+                    const showId = event.target.dataset.showId || 'unknown';
+                    logDiagnostic('episode_btn_click', showId);
+                    
+                    try {
+                        return handleEpisodeUpdate.call(this, event);
+                    } catch (error) {
+                        logDiagnostic('episode_btn_error', showId, error);
+                        if (error.message && error.message.includes('Could not establish connection')) {
+                            console.warn('🛡️ EXTENSION ERROR in episode button:', error.message);
+                            return; // Suppress extension errors
+                        }
+                        throw error; // Re-throw non-extension errors
+                    }
+                };
+                
+                btn.addEventListener('click', wrappedHandler);
+                logDiagnostic('episode_btn_listener_added', btn.dataset.showId || 'unknown');
             } catch (error) {
+                logDiagnostic('episode_btn_setup_error', 'unknown', error);
                 console.warn('Episode button listener error suppressed:', error);
             }
         });
         
-        // Star ratings
+        // Star ratings with diagnostic wrapping
         document.querySelectorAll('.star-rating i').forEach(star => {
             try {
-                star.addEventListener('click', handleRatingUpdate);
+                const wrappedHandler = function(event) {
+                    const showId = event.target.closest('.star-rating').dataset.showId || 'unknown';
+                    logDiagnostic('star_rating_click', showId);
+                    
+                    try {
+                        return handleRatingUpdate.call(this, event);
+                    } catch (error) {
+                        logDiagnostic('star_rating_error', showId, error);
+                        if (error.message && error.message.includes('Could not establish connection')) {
+                            console.warn('🛡️ EXTENSION ERROR in star rating:', error.message);
+                            return; // Suppress extension errors
+                        }
+                        throw error; // Re-throw non-extension errors
+                    }
+                };
+                
+                star.addEventListener('click', wrappedHandler);
+                logDiagnostic('star_rating_listener_added', star.closest('.star-rating').dataset.showId || 'unknown');
             } catch (error) {
+                logDiagnostic('star_rating_setup_error', 'unknown', error);
                 console.warn('Star rating listener error suppressed:', error);
             }
         });
         
-        // Status dropdowns
+        // Status dropdowns with diagnostic wrapping  
         document.querySelectorAll('.status-dropdown').forEach(dropdown => {
             try {
-                dropdown.addEventListener('change', handleStatusUpdate);
+                const wrappedHandler = function(event) {
+                    const showId = event.target.dataset.showId || 'unknown';
+                    logDiagnostic('status_dropdown_change', showId);
+                    
+                    try {
+                        return handleStatusUpdate.call(this, event);
+                    } catch (error) {
+                        logDiagnostic('status_dropdown_error', showId, error);
+                        if (error.message && error.message.includes('Could not establish connection')) {
+                            console.warn('🛡️ EXTENSION ERROR in status dropdown:', error.message);
+                            return; // Suppress extension errors
+                        }
+                        throw error; // Re-throw non-extension errors
+                    }
+                };
+                
+                dropdown.addEventListener('change', wrappedHandler);
+                logDiagnostic('status_dropdown_listener_added', dropdown.dataset.showId || 'unknown');
             } catch (error) {
+                logDiagnostic('status_dropdown_setup_error', 'unknown', error);
                 console.warn('Status dropdown listener error suppressed:', error);
             }
         });
+        
+        logDiagnostic('setupShowCardListeners_success', 'all');
     } catch (error) {
+        logDiagnostic('setupShowCardListeners_error', 'all', error);
         console.warn('Overall event listener setup error suppressed:', error);
     }
 }
@@ -1232,3 +1378,82 @@ function showNotification(message, type = 'info') {
         }
     }, 5000);
 }
+
+// 🔍 DIAGNOSTIC FUNCTIONS FOR ERROR TRACKING
+
+function showDiagnosticLog() {
+    const diagnosticWindow = window.open('', '_blank', 'width=800,height=600');
+    const logHtml = `
+<!DOCTYPE html>
+<html>
+<head>
+    <title>🔍 Show Interaction Diagnostic Log</title>
+    <style>
+        body { font-family: monospace; background: #1a1a1a; color: #00ff00; padding: 20px; }
+        .error { color: #ff4444; font-weight: bold; }
+        .success { color: #44ff44; }
+        .info { color: #4444ff; }
+        .entry { margin: 8px 0; padding: 8px; border-left: 3px solid #333; }
+        .timestamp { color: #888; font-size: 0.9em; }
+        h1 { color: #00ff00; border-bottom: 2px solid #00ff00; }
+        .stats { background: #2a2a2a; padding: 15px; margin: 20px 0; border-radius: 8px; }
+        button { background: #333; color: #00ff00; border: 1px solid #00ff00; padding: 8px 16px; margin: 5px; cursor: pointer; }
+        button:hover { background: #444; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Show Interaction Diagnostic Log</h1>
+    <div class="stats">
+        <strong>Total Entries:</strong> ${diagnosticLog.length}<br>
+        <strong>Error Count:</strong> ${diagnosticLog.filter(e => e.error).length}<br>
+        <strong>Extension Errors:</strong> ${diagnosticLog.filter(e => e.error && e.error.includes('Could not establish connection')).length}<br>
+        <strong>Diagnostic Mode:</strong> ${diagnosticMode ? 'ON' : 'OFF'}
+    </div>
+    <button onclick="location.reload()">Refresh</button>
+    <button onclick="navigator.clipboard.writeText(document.body.innerText)">Copy Log</button>
+    <hr>
+    <div class="log">
+        ${diagnosticLog.map(entry => `
+            <div class="entry ${entry.error ? 'error' : 'success'}">
+                <div class="timestamp">${entry.timestamp}</div>
+                <strong>Action:</strong> ${entry.action}<br>
+                <strong>Show ID:</strong> ${entry.showId}<br>
+                ${entry.error ? `<strong>Error:</strong> ${entry.error}<br>` : ''}
+                ${entry.stack ? `<details><summary>Stack Trace</summary><pre>${entry.stack}</pre></details>` : ''}
+            </div>
+        `).join('')}
+    </div>
+</body>
+</html>`;
+    
+    diagnosticWindow.document.write(logHtml);
+    diagnosticWindow.document.close();
+}
+
+// Add diagnostic button to page
+setTimeout(() => {
+    const diagnosticBtn = document.createElement('button');
+    diagnosticBtn.innerHTML = '<i class="fas fa-bug"></i>';
+    diagnosticBtn.className = 'floating-btn';
+    diagnosticBtn.style.cssText = `
+        position: fixed;
+        bottom: 80px;
+        right: 20px;
+        background: #333;
+        color: #ff6b35;
+        border: 2px solid #ff6b35;
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        font-size: 16px;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+        z-index: 1000;
+    `;
+    
+    diagnosticBtn.onclick = showDiagnosticLog;
+    diagnosticBtn.title = 'View Diagnostic Log';
+    
+    document.body.appendChild(diagnosticBtn);
+    console.log('🔍 Diagnostic button added');
+}, 1000);

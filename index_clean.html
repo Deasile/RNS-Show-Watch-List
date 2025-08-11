@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RNS Show Watch List</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='14' height='10' x='1' y='3' fill='%234a90e2' stroke='%23333' stroke-width='0.5' rx='1'/><circle cx='12' cy='6' r='0.8' fill='%23fff'/><circle cx='12' cy='8' r='0.8' fill='%23fff'/><rect width='8' height='6' x='2' y='4' fill='%23000'/></svg>" type="image/svg+xml">
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1><i class="fas fa-tv"></i> RNS Show Watch List</h1>
+            <p class="subtitle">Track your anime and shows with ease</p>
+        </header>
+
+        <!-- Controls -->
+        <div class="controls">
+            <!-- Search -->
+            <div class="search-container">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" name="searchInput" placeholder="Search shows... (try: rating:5, status:watching, progress:>50)" class="search-input">
+                <div class="search-help" style="display: none;">
+                    <div class="search-tip">💡 Search tips:</div>
+                    <div>• <code>rating:5</code> - Shows with 5 stars</div>
+                    <div>• <code>status:watching</code> - Shows being watched</div>
+                    <div>• <code>progress:>80</code> - Shows over 80% complete</div>
+                    <div>• Regular text search works too!</div>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="filter-container">
+                <select id="statusFilter" name="statusFilter" class="filter-select">
+                    <option value="">All Status</option>
+                    <option value="Watching">Watching</option>
+                    <option value="Completed">Completed</option>
+                    <option value="Planned">Planned</option>
+                    <option value="On Hold">On Hold</option>
+                    <option value="Dropped">Dropped</option>
+                    <option value="Adult">Adult</option>
+                    <option value="Check Later">Check Later</option>
+                </select>
+
+                <select id="sortBy" name="sortBy" class="filter-select">
+                    <option value="name">Sort by Name</option>
+                    <option value="rating">Sort by Rating</option>
+                    <option value="progress">Sort by Progress</option>
+                    <option value="status">Sort by Status</option>
+                </select>
+
+                <button id="toggleView" class="btn secondary">
+                    <i class="fas fa-list"></i> List View
+                </button>
+            </div>
+        </div>
+
+        <!-- Analytics Dashboard -->
+        <div class="analytics-dashboard">
+            <div class="analytics-card">
+                <div class="analytics-number" id="totalShows">0</div>
+                <div class="analytics-label">Total Shows</div>
+            </div>
+            <div class="analytics-card">
+                <div class="analytics-number" id="completedShows">0</div>
+                <div class="analytics-label">Completed</div>
+            </div>
+            <div class="analytics-card">
+                <div class="analytics-number" id="currentlyWatching">0</div>
+                <div class="analytics-label">Watching</div>
+            </div>
+            <div class="analytics-card">
+                <div class="analytics-number" id="averageRating">0</div>
+                <div class="analytics-label">Avg Rating</div>
+            </div>
+            <div class="analytics-card">
+                <div class="analytics-number" id="totalEpisodes">0</div>
+                <div class="analytics-label">Episodes Watched</div>
+            </div>
+        </div>
+
+        <!-- Export Controls -->
+        <div class="export-controls">
+            <button id="exportJson" class="btn secondary">
+                <i class="fas fa-download"></i> Export JSON
+            </button>
+            <button id="exportCsv" class="btn secondary">
+                <i class="fas fa-file-csv"></i> Export CSV
+            </button>
+        </div>
+
+        <!-- Shows Container -->
+        <div id="showsContainer" class="shows-grid">
+            <!-- Shows will be populated here -->
+        </div>
+
+        <!-- Floating Add Button -->
+        <button id="addShowBtn" class="floating-btn">
+            <i class="fas fa-plus"></i>
+        </button>
+    </div>
+
+    <!-- Add Show Modal -->
+    <div id="addShowModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-plus-circle"></i> Add New Show</h2>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="addShowForm">
+                    <div class="form-group">
+                        <label for="showName" class="form-label">Show Name</label>
+                        <input type="text" id="showName" name="showName" required>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="showStatus" class="form-label">Status</label>
+                            <select id="showStatus" name="showStatus" required>
+                                <option value="Planned">Planned</option>
+                                <option value="Watching">Watching</option>
+                                <option value="Completed">Completed</option>
+                                <option value="On Hold">On Hold</option>
+                                <option value="Dropped">Dropped</option>
+                                <option value="Adult">Adult</option>
+                                <option value="Check Later">Check Later</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="showRating" class="form-label">Rating</label>
+                            <select id="showRating" name="showRating">
+                                <option value="0">No Rating</option>
+                                <option value="1">1 Star</option>
+                                <option value="2">2 Stars</option>
+                                <option value="3">3 Stars</option>
+                                <option value="4">4 Stars</option>
+                                <option value="5">5 Stars</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="watchedEpisodes" class="form-label">Watched Episodes</label>
+                            <input type="number" id="watchedEpisodes" name="watchedEpisodes" min="0" value="0">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="totalEpisodes" class="form-label">Total Episodes</label>
+                            <input type="number" id="totalEpisodes" name="totalEpisodes" min="0" value="0">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="showGenre" class="form-label">Genre (Optional)</label>
+                        <input type="text" id="showGenre" name="showGenre" placeholder="e.g., Action, Romance, Comedy">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="showYear" class="form-label">Year (Optional)</label>
+                        <input type="number" id="showYear" name="showYear" min="1900" max="2030" placeholder="e.g., 2023">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="showNotes" class="form-label">Notes (Optional)</label>
+                        <textarea id="showNotes" name="showNotes" rows="3" placeholder="Any additional notes about this show..."></textarea>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn secondary cancel-btn">Cancel</button>
+                        <button type="submit" class="btn primary">Add Show</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="script_clean.js"></script>
+</body>
+</html>

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔍 Clean Test - Extension Error Diagnostic</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .test-container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .link-button { 
+            display: inline-block; 
+            padding: 10px 20px; 
+            margin: 10px; 
+            background: #007bff; 
+            color: white; 
+            text-decoration: none; 
+            border-radius: 5px; 
+            border: none;
+            cursor: pointer;
+        }
+        .link-button:hover { background: #0056b3; }
+        .diagnostic { background: #333; color: #00ff00; }
+        .clean { background: #28a745; }
+        .original { background: #dc3545; }
+        .note { background: #fff3cd; padding: 15px; border-radius: 5px; margin: 10px 0; border: 1px solid #ffeaa7; }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🔍 Extension Error Diagnostic Test</h1>
+        
+        <div class="note">
+            <strong>🎯 Testing Goal:</strong> Identify the exact source of the "Could not establish connection" error without interference from protection code.
+        </div>
+        
+        <h2>🧪 Test Applications:</h2>
+        
+        <a href="/diagnostic.html" class="link-button diagnostic" target="_blank">
+            🔍 Diagnostic Monitor
+        </a>
+        <p>Real-time console error capture and analysis</p>
+        
+        <a href="/index_clean.html?diagnostic=true" class="link-button clean" target="_blank">
+            ✨ Clean App (Diagnostic Mode)
+        </a>
+        <p>Clean application with lightweight diagnostic tracking</p>
+        
+        <a href="/index.html" class="link-button original" target="_blank">
+            ⚠️ Original App (With Protection)
+        </a>
+        <p>Original application with nuclear protection (may cause conflicts)</p>
+        
+        <h2>🧪 Testing Protocol:</h2>
+        <ol>
+            <li><strong>Open Diagnostic Monitor</strong> in one tab</li>
+            <li><strong>Open Clean App</strong> in another tab</li>
+            <li><strong>Interact with shows</strong> in the clean app:
+                <ul>
+                    <li>Click on status dropdowns</li>
+                    <li>Click on star ratings</li>
+                    <li>Click episode +/- buttons</li>
+                    <li>Switch between grid and list view</li>
+                </ul>
+            </li>
+            <li><strong>Monitor the diagnostic tab</strong> for exact error timing and details</li>
+            <li><strong>Click the bug button</strong> in the clean app to see interaction logs</li>
+        </ol>
+        
+        <h2>🎯 What We're Looking For:</h2>
+        <ul>
+            <li>⏰ <strong>Exact timing</strong> of when the extension error occurs</li>
+            <li>🎯 <strong>Which specific interaction</strong> triggers it</li>
+            <li>📍 <strong>Which show ID</strong> is involved</li>
+            <li>📊 <strong>Complete error stack trace</strong> and context</li>
+        </ul>
+        
+        <div class="note">
+            <strong>💡 Pro Tip:</strong> Enable diagnostic mode (?diagnostic=true) for detailed logging, and keep both the diagnostic monitor and clean app open side-by-side for real-time analysis.
+        </div>
+    </div>
+    
+    <script>
+        console.log('🧪 Test page loaded - ready for extension error diagnosis');
+        console.log('🎯 Goal: Identify root cause without protection interference');
+        
+        // Simple error tracking for this test page
+        window.addEventListener('unhandledrejection', function(event) {
+            console.log('🔍 TEST PAGE - Unhandled rejection:', event.reason);
+        });
+        
+        window.addEventListener('error', function(event) {
+            console.log('🔍 TEST PAGE - Error:', event.message);
+        });
+    </script>
+</body>
+</html>
