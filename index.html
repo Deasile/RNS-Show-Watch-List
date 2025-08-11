@@ -7,34 +7,92 @@
     <title>RNS Show Watch List</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='14' height='10' x='1' y='3' fill='%234a90e2' stroke='%23333' stroke-width='0.5' rx='1'/><circle cx='12' cy='6' r='0.8' fill='%23fff'/><circle cx='12' cy='8' r='0.8' fill='%23fff'/><rect width='8' height='6' x='2' y='4' fill='%23000'/></svg>" type="image/svg+xml">
     
-    <!-- 🛡️ IMMEDIATE EXTENSION PROTECTION - Load first before any extension scripts -->
+    <!-- 🛡️ NUCLEAR EXTENSION PROTECTION - Complete chrome object neutralization -->
     <script>
         (function() {
             'use strict';
-            console.log('🛡️ Extension protection loading...');
+            console.log('� NUCLEAR PROTECTION: Complete chrome object neutralization');
             
-            // Immediate promise rejection handler
+            // LEVEL 1: Global promise rejection handler (most aggressive)
             window.addEventListener('unhandledrejection', function(event) {
-                if (event.reason && event.reason.message && (
-                    event.reason.message.includes('Could not establish connection') ||
-                    event.reason.message.includes('Receiving end does not exist') ||
-                    event.reason.message.includes('Extension context invalidated') ||
-                    event.reason.message.includes('chrome-extension://') ||
-                    event.reason.message.includes('moz-extension://')
-                )) {
-                    console.warn('🛡️ BLOCKED Extension promise rejection:', event.reason.message);
+                const errorMsg = (event.reason && event.reason.message) ? event.reason.message : String(event.reason);
+                if (errorMsg.includes('Could not establish connection') ||
+                    errorMsg.includes('Receiving end does not exist') ||
+                    errorMsg.includes('Extension context invalidated') ||
+                    errorMsg.includes('chrome-extension://') ||
+                    errorMsg.includes('moz-extension://') ||
+                    errorMsg.includes('chrome.runtime') ||
+                    errorMsg.includes('sendMessage') ||
+                    errorMsg.includes('connect')) {
+                    console.warn('🛡️ NUCLEAR BLOCK:', errorMsg);
                     event.preventDefault();
                     event.stopPropagation();
+                    event.stopImmediatePropagation();
                     return false;
                 }
             });
             
-            // Block chrome object creation if problematic
+            // LEVEL 2: Completely replace chrome object before extensions load
             if (typeof chrome !== 'undefined') {
-                console.log('🛡️ Chrome object detected, installing protection...');
+                console.log('🛡️ Replacing existing chrome object...');
             }
             
-            console.log('🛡️ Extension protection active');
+            // Create safe mock chrome object
+            const safeChromeObject = {
+                runtime: {
+                    sendMessage: function() {
+                        console.warn('🛡️ Extension sendMessage blocked - returning resolved promise');
+                        return Promise.resolve({});
+                    },
+                    connect: function() {
+                        console.warn('🛡️ Extension connect blocked - returning mock port');
+                        return {
+                            postMessage: function() { console.warn('🛡️ Port postMessage blocked'); },
+                            onMessage: { addListener: function() { console.warn('🛡️ Port onMessage blocked'); } },
+                            onDisconnect: { addListener: function() { console.warn('🛡️ Port onDisconnect blocked'); } },
+                            disconnect: function() { console.warn('🛡️ Port disconnect blocked'); }
+                        };
+                    },
+                    onMessage: { addListener: function() { console.warn('🛡️ Runtime onMessage blocked'); } },
+                    onConnect: { addListener: function() { console.warn('🛡️ Runtime onConnect blocked'); } },
+                    id: undefined // Explicitly undefined to signal no extension
+                }
+            };
+            
+            // LEVEL 3: Override chrome with non-configurable property
+            try {
+                Object.defineProperty(window, 'chrome', {
+                    value: safeChromeObject,
+                    writable: false,
+                    configurable: false,
+                    enumerable: true
+                });
+                console.log('✅ Chrome object permanently replaced with safe version');
+            } catch(e) {
+                console.warn('⚠️ Could not override chrome object:', e.message);
+                // Fallback: direct assignment
+                window.chrome = safeChromeObject;
+                console.log('✅ Chrome object replaced via direct assignment');
+            }
+            
+            // LEVEL 4: Block any attempts to restore chrome
+            const observer = new MutationObserver(function() {
+                if (window.chrome !== safeChromeObject) {
+                    console.warn('🛡️ Chrome object restoration attempt blocked');
+                    window.chrome = safeChromeObject;
+                }
+            });
+            
+            // Start monitoring immediately
+            if (document.body) {
+                observer.observe(document.body, { childList: true, subtree: true });
+            } else {
+                document.addEventListener('DOMContentLoaded', function() {
+                    observer.observe(document.body, { childList: true, subtree: true });
+                });
+            }
+            
+            console.log('� NUCLEAR PROTECTION COMPLETE - Extensions neutralized');
         })();
     </script>
     
@@ -42,6 +100,45 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
+    <!-- 🛡️ BODY-LEVEL PROTECTION: Immediate script execution -->
+    <script>
+        console.log('🛡️ Body-level protection initializing...');
+        
+        // Override any remaining console.error calls from extensions
+        const originalConsoleError = console.error;
+        console.error = function(...args) {
+            const errorMessage = args.join(' ');
+            if (errorMessage.includes('Could not establish connection') ||
+                errorMessage.includes('Receiving end does not exist') ||
+                errorMessage.includes('Extension context invalidated') ||
+                errorMessage.includes('chrome-extension://') ||
+                errorMessage.includes('sendMessage') ||
+                errorMessage.includes('chrome.runtime')) {
+                console.warn('🛡️ INTERCEPTED console.error:', errorMessage);
+                return; // Block the error completely
+            }
+            originalConsoleError.apply(console, args); // Allow other errors
+        };
+        
+        // Ensure chrome object remains safe
+        if (typeof window.chrome === 'undefined' || !window.chrome.runtime || !window.chrome.runtime.sendMessage) {
+            console.warn('🛡️ Chrome object missing or incomplete, recreating...');
+            window.chrome = {
+                runtime: {
+                    sendMessage: () => Promise.resolve({}),
+                    connect: () => ({
+                        postMessage: () => {},
+                        onMessage: { addListener: () => {} },
+                        onDisconnect: { addListener: () => {} },
+                        disconnect: () => {}
+                    })
+                }
+            };
+        }
+        
+        console.log('✅ Body-level protection complete');
+    </script>
+    
     <div class="container">
         <!-- Header -->
         <header class="header">
