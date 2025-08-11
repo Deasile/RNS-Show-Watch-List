@@ -3,6 +3,21 @@ let allShows = [];
 let filteredShows = [];
 let isGridView = true;
 
+// Suppress extension connection errors
+window.addEventListener('error', function(e) {
+    if (e.message && e.message.includes('Could not establish connection')) {
+        e.preventDefault();
+        return false;
+    }
+});
+
+window.addEventListener('unhandledrejection', function(e) {
+    if (e.reason && e.reason.message && e.reason.message.includes('Could not establish connection')) {
+        e.preventDefault();
+        return false;
+    }
+});
+
 // DOM elements
 const showList = document.getElementById('showList');
 const searchInput = document.getElementById('searchInput');

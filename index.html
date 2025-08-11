@@ -20,7 +20,7 @@
             <!-- Search -->
             <div class="search-container">
                 <i class="fas fa-search"></i>
-                <input type="text" id="searchInput" placeholder="Search shows... (try: rating:5, status:watching, progress:>50)" class="search-input">
+                <input type="text" id="searchInput" name="searchInput" placeholder="Search shows... (try: rating:5, status:watching, progress:>50)" class="search-input">
                 <div class="search-help" style="display: none;">
                     <div class="search-tip">💡 Search tips:</div>
                     <div>• <code>rating:5</code> - Shows with 5 stars</div>
@@ -32,7 +32,7 @@
 
             <!-- Filters -->
             <div class="filters">
-                <select id="statusFilter" class="filter-select">
+                <select id="statusFilter" name="statusFilter" class="filter-select">
                     <option value="">All Status</option>
                     <option value="Watching">Watching</option>
                     <option value="Completed">Completed</option>
@@ -43,7 +43,7 @@
                     <option value="Check Later">Check Later</option>
                 </select>
 
-                <select id="sortBy" class="filter-select">
+                <select id="sortBy" name="sortBy" class="filter-select">
                     <option value="name">Sort by Name</option>
                     <option value="progress">Sort by Progress</option>
                     <option value="rating">Sort by Rating</option>
@@ -124,11 +124,11 @@
                     <form id="addShowForm">
                         <div class="form-group">
                             <label for="showName">Show Name</label>
-                            <input type="text" id="showName" required>
+                            <input type="text" id="showName" name="showName" required>
                         </div>
                         <div class="form-group">
                             <label for="showStatus">Status</label>
-                            <select id="showStatus">
+                            <select id="showStatus" name="showStatus">
                                 <option value="Planned">Planned</option>
                                 <option value="Watching">Watching</option>
                                 <option value="Completed">Completed</option>
@@ -137,14 +137,14 @@
                         </div>
                         <div class="form-group">
                             <label for="showEpisodes">Total Episodes</label>
-                            <input type="number" id="showEpisodes" min="0">
+                            <input type="number" id="showEpisodes" name="showEpisodes" min="0">
                         </div>
                         <div class="form-group">
                             <label for="showWatched">Watched Episodes</label>
-                            <input type="number" id="showWatched" min="0" value="0">
+                            <input type="number" id="showWatched" name="showWatched" min="0" value="0">
                         </div>
                         <div class="form-group">
-                            <label for="showRating">Rating</label>
+                            <label for="newShowRating">Rating</label>
                             <div class="star-rating" id="newShowRating">
                                 <i class="far fa-star" data-rating="1"></i>
                                 <i class="far fa-star" data-rating="2"></i>
