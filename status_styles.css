@@ -1,0 +1,147 @@
+/* Auto-generated CSS for all status types */
+/* Generated on 2025-08-11 06:59:32 */
+
+.status-watching {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #15572433;
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 0.8em;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-watching::before {
+    content: "\fpla";
+    font-family: "Font Awesome 5 Free";
+    margin-right: 4px;
+}
+
+.status-current {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #0c546033;
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 0.8em;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-current::before {
+    content: "\fpla";
+    font-family: "Font Awesome 5 Free";
+    margin-right: 4px;
+}
+
+.status-completed {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #721c2433;
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 0.8em;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-completed::before {
+    content: "\fche";
+    font-family: "Font Awesome 5 Free";
+    margin-right: 4px;
+}
+
+.status-planned {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #85640433;
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 0.8em;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-planned::before {
+    content: "\fclo";
+    font-family: "Font Awesome 5 Free";
+    margin-right: 4px;
+}
+
+.status-on-hold {
+    background-color: #f0f0f0;
+    color: #6c757d;
+    border: 1px solid #6c757d33;
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 0.8em;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-on-hold::before {
+    content: "\fpau";
+    font-family: "Font Awesome 5 Free";
+    margin-right: 4px;
+}
+
+.status-dropped {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #721c2433;
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 0.8em;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-dropped::before {
+    content: "\ftim";
+    font-family: "Font Awesome 5 Free";
+    margin-right: 4px;
+}
+
+.status-adult {
+    background-color: #e2e3e5;
+    color: #383d41;
+    border: 1px solid #383d4133;
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 0.8em;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-adult::before {
+    content: "\fuse";
+    font-family: "Font Awesome 5 Free";
+    margin-right: 4px;
+}
+
+.status-check-later {
+    background-color: #ffeaa7;
+    color: #6c5ce7;
+    border: 1px solid #6c5ce733;
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 0.8em;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-check-later::before {
+    content: "\fboo";
+    font-family: "Font Awesome 5 Free";
+    margin-right: 4px;
+}
+

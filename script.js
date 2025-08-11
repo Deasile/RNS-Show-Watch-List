@@ -31,7 +31,18 @@ async function loadShows() {
     try {
         showLoading();
         const response = await fetch('shows_data.json');
+        
+        if (!response.ok) {
+            throw new Error(`Failed to load shows: ${response.status} ${response.statusText}`);
+        }
+        
         allShows = await response.json();
+        
+        // Validate loaded data
+        const validationResults = validateShowsData(allShows);
+        if (validationResults.errors.length > 0) {
+            console.warn('Data validation issues found:', validationResults.errors);
+        }
         
         // Load any user modifications from localStorage
         const userModifications = JSON.parse(localStorage.getItem('userModifications') || '{}');
@@ -46,9 +57,16 @@ async function loadShows() {
         displayShows();
         updateStatistics();
         hideLoading();
+        
+        // Show success message if data was cleaned
+        if (allShows.length > 0) {
+            showNotification(`Successfully loaded ${allShows.length} shows with clean data!`, 'success');
+        }
+        
     } catch (error) {
         console.error('Error loading shows:', error);
-        showEmptyState('Error loading shows. Please refresh the page.');
+        showEmptyState(`Error loading shows: ${error.message}`);
+        showNotification('Failed to load show data. Please check your connection and try again.', 'error');
     }
 }
 
@@ -176,11 +194,25 @@ function handleSearch() {
 // Handle filter
 function handleFilter() {
     const statusValue = statusFilter.value;
+    
     if (statusValue) {
-        filteredShows = filteredShows.filter(show => 
-            show.status.toLowerCase().includes(statusValue.toLowerCase())
-        );
+        filteredShows = allShows.filter(show => {
+            // Exact match for the cleaned status values
+            return show.status === statusValue;
+        });
+    } else {
+        // Show all shows when no filter is selected
+        filteredShows = [...allShows];
+        
+        // Apply search if there's a search query
+        const query = searchInput.value.toLowerCase();
+        if (query) {
+            filteredShows = filteredShows.filter(show => 
+                show.name.toLowerCase().includes(query)
+            );
+        }
     }
+    
     applySort();
     displayShows();
     updateStatistics();
@@ -414,16 +446,26 @@ function exportToCsv() {
 // Update statistics
 function updateStatistics() {
     const total = allShows.length;
+    
+    // Use exact status matching for accurate statistics
     const watching = allShows.filter(show => 
-        show.status.toLowerCase().includes('watching') || 
-        show.status.toLowerCase().includes('current')
-    ).length;
-    const completed = allShows.filter(show => 
-        show.status.toLowerCase().includes('completed')
+        show.status === 'Watching'
     ).length;
     
-    const totalProgress = allShows.reduce((sum, show) => sum + (show.progress || 0), 0);
-    const avgProgress = total > 0 ? Math.round(totalProgress / total) : 0;
+    const completed = allShows.filter(show => 
+        show.status === 'Completed'
+    ).length;
+    
+    // Calculate average progress more accurately
+    const showsWithProgress = allShows.filter(show => show.total_episodes > 0);
+    const totalProgress = showsWithProgress.reduce((sum, show) => {
+        const progress = show.total_episodes > 0 ? 
+            (show.watched_episode / show.total_episodes) * 100 : 0;
+        return sum + progress;
+    }, 0);
+    
+    const avgProgress = showsWithProgress.length > 0 ? 
+        Math.round(totalProgress / showsWithProgress.length) : 0;
     
     totalShows.textContent = total;
     watchingShows.textContent = watching;
@@ -478,4 +520,72 @@ function escapeHtml(text) {
         "'": '&#039;'
     };
     return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+}
+
+// Data validation function
+function validateShowsData(shows) {
+    const validStatuses = ['Watching', 'Completed', 'Planned', 'On Hold', 'Dropped', 'Adult', 'Check Later'];
+    const errors = [];
+    const warnings = [];
+    
+    shows.forEach(show => {
+        // Check required fields
+        if (!show.name || show.name.trim() === '') {
+            errors.push(`Show ID ${show.id}: Missing name`);
+        }
+        
+        if (!validStatuses.includes(show.status)) {
+            warnings.push(`Show "${show.name}": Unknown status "${show.status}"`);
+        }
+        
+        // Check numeric values
+        if (show.watched_episode < 0) {
+            errors.push(`Show "${show.name}": Negative watched episodes`);
+        }
+        
+        if (show.total_episodes < 0) {
+            errors.push(`Show "${show.name}": Negative total episodes`);
+        }
+        
+        if (show.rating < 0 || show.rating > 5) {
+            errors.push(`Show "${show.name}": Invalid rating (${show.rating})`);
+        }
+        
+        // Check logical consistency
+        if (show.total_episodes > 0 && show.watched_episode > show.total_episodes) {
+            warnings.push(`Show "${show.name}": Watched more episodes than total`);
+        }
+    });
+    
+    return { errors, warnings };
+}
+
+// Notification system
+function showNotification(message, type = 'info') {
+    // Remove existing notifications
+    const existingNotification = document.querySelector('.notification');
+    if (existingNotification) {
+        existingNotification.remove();
+    }
+    
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.innerHTML = `
+        <div class="notification-content">
+            <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i>
+            <span>${message}</span>
+            <button class="notification-close" onclick="this.parentElement.parentElement.remove()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+        if (notification.parentElement) {
+            notification.remove();
+        }
+    }, 5000);
 }
