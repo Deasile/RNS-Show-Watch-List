@@ -580,6 +580,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     s.classList.add('far');
                 }
             });
+            // Update the hidden input field
+            document.getElementById('showRating').value = rating;
         });
     });
 });
