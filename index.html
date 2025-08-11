@@ -135,6 +135,24 @@
         <button id="addShowBtn" class="floating-btn">
             <i class="fas fa-plus"></i>
         </button>
+
+        <!-- Debug Panel -->
+        <div id="debugPanel" class="debug-panel">
+            <div class="debug-header">
+                <h3>Debug Console</h3>
+                <button id="toggleDebug" class="debug-toggle">Hide</button>
+            </div>
+            <div class="debug-content">
+                <div class="debug-stats">
+                    <span>Shows: <span id="debugShowCount">0</span></span>
+                    <span>Filtered: <span id="debugFilteredCount">0</span></span>
+                    <span>View: <span id="debugCurrentView">Grid</span></span>
+                </div>
+                <div class="debug-logs" id="debugLogs">
+                    <!-- Logs will be populated here -->
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="script.js"></script>
