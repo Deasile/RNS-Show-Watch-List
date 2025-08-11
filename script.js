@@ -3,6 +3,45 @@ let allShows = [];
 let filteredShows = [];
 let isGridView = true;
 
+// Comprehensive extension communication error suppression
+(function() {
+    'use strict';
+    
+    // Override chrome runtime messaging if it exists
+    if (typeof chrome !== 'undefined' && chrome.runtime) {
+        const originalSendMessage = chrome.runtime.sendMessage;
+        chrome.runtime.sendMessage = function(...args) {
+            try {
+                return originalSendMessage.apply(this, args);
+            } catch (error) {
+                console.warn('Chrome extension message blocked:', error.message);
+                return Promise.resolve();
+            }
+        };
+    }
+    
+    // Block extension port connections
+    if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.connect) {
+        const originalConnect = chrome.runtime.connect;
+        chrome.runtime.connect = function(...args) {
+            try {
+                const port = originalConnect.apply(this, args);
+                port.onDisconnect.addListener(() => {
+                    console.warn('Extension port disconnected - suppressed');
+                });
+                return port;
+            } catch (error) {
+                console.warn('Extension connection blocked:', error.message);
+                return {
+                    postMessage: () => {},
+                    onMessage: { addListener: () => {} },
+                    onDisconnect: { addListener: () => {} }
+                };
+            }
+        };
+    }
+})();
+
 // Enhanced error suppression for browser extension conflicts
 window.addEventListener('error', function(e) {
     // Suppress extension-related errors
@@ -12,7 +51,9 @@ window.addEventListener('error', function(e) {
         e.message.includes('Extension context invalidated') ||
         e.message.includes('chrome-extension://') ||
         e.message.includes('moz-extension://') ||
-        e.message.includes('The message port closed before a response was received')
+        e.message.includes('The message port closed before a response was received') ||
+        e.message.includes('Attempting to use a disconnected port object') ||
+        e.message.includes('chrome.runtime.sendMessage')
     )) {
         console.warn('Browser extension error suppressed:', e.message);
         e.preventDefault();
@@ -28,12 +69,15 @@ window.addEventListener('unhandledrejection', function(e) {
             e.reason.message.includes('Could not establish connection') ||
             e.reason.message.includes('Receiving end does not exist') ||
             e.reason.message.includes('Extension context invalidated') ||
-            e.reason.message.includes('The message port closed before a response was received')
+            e.reason.message.includes('The message port closed before a response was received') ||
+            e.reason.message.includes('Attempting to use a disconnected port object') ||
+            e.reason.message.includes('chrome.runtime.sendMessage')
         )) ||
         (typeof e.reason === 'string' && (
             e.reason.includes('Could not establish connection') ||
             e.reason.includes('Receiving end does not exist') ||
-            e.reason.includes('The message port closed before a response was received')
+            e.reason.includes('The message port closed before a response was received') ||
+            e.reason.includes('Attempting to use a disconnected port object')
         ))
     )) {
         console.warn('Browser extension promise rejection suppressed:', e.reason);
@@ -52,7 +96,8 @@ EventTarget.prototype.addEventListener = function(type, listener, options) {
             } catch (error) {
                 if (error.message && (
                     error.message.includes('Could not establish connection') ||
-                    error.message.includes('Receiving end does not exist')
+                    error.message.includes('Receiving end does not exist') ||
+                    error.message.includes('Extension context invalidated')
                 )) {
                     console.warn('Extension error in event listener suppressed:', error.message);
                     return false;
@@ -84,6 +129,39 @@ const averageProgress = document.getElementById('averageProgress');
 
 // Initialize the app
 document.addEventListener('DOMContentLoaded', function() {
+    // Final safety net: debounced error protection
+    let errorCount = 0;
+    const maxErrors = 10;
+    const errorResetTime = 5000; // 5 seconds
+    
+    function resetErrorCount() {
+        errorCount = 0;
+    }
+    
+    // Monitor for extension connection errors specifically
+    const originalConsoleError = console.error;
+    console.error = function(...args) {
+        const errorMessage = args.join(' ');
+        if (errorMessage.includes('Could not establish connection') || 
+            errorMessage.includes('Receiving end does not exist')) {
+            errorCount++;
+            console.warn(`Extension connection error #${errorCount} suppressed:`, errorMessage);
+            
+            if (errorCount === 1) {
+                // Reset counter after delay
+                setTimeout(resetErrorCount, errorResetTime);
+            }
+            
+            if (errorCount > maxErrors) {
+                console.warn('Too many extension errors detected. Consider disabling problematic extensions.');
+                resetErrorCount();
+            }
+            return; // Don't show the error
+        }
+        // Allow other errors through
+        originalConsoleError.apply(console, args);
+    };
+    
     loadShows();
     setupEventListeners();
     loadUserPreferences();
