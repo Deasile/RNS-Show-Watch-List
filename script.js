@@ -3,16 +3,36 @@ let allShows = [];
 let filteredShows = [];
 let isGridView = true;
 
-// Suppress extension connection errors
+// Comprehensive error suppression for browser extension conflicts
 window.addEventListener('error', function(e) {
-    if (e.message && e.message.includes('Could not establish connection')) {
+    // Suppress extension-related errors
+    if (e.message && (
+        e.message.includes('Could not establish connection') ||
+        e.message.includes('Receiving end does not exist') ||
+        e.message.includes('Extension context invalidated') ||
+        e.message.includes('chrome-extension://') ||
+        e.message.includes('moz-extension://')
+    )) {
+        console.warn('Browser extension error suppressed:', e.message);
         e.preventDefault();
         return false;
     }
 });
 
 window.addEventListener('unhandledrejection', function(e) {
-    if (e.reason && e.reason.message && e.reason.message.includes('Could not establish connection')) {
+    // Suppress promise rejections from extensions
+    if (e.reason && (
+        (e.reason.message && (
+            e.reason.message.includes('Could not establish connection') ||
+            e.reason.message.includes('Receiving end does not exist') ||
+            e.reason.message.includes('Extension context invalidated')
+        )) ||
+        (typeof e.reason === 'string' && (
+            e.reason.includes('Could not establish connection') ||
+            e.reason.includes('Receiving end does not exist')
+        ))
+    )) {
+        console.warn('Browser extension promise rejection suppressed:', e.reason);
         e.preventDefault();
         return false;
     }
@@ -369,91 +389,108 @@ function applyFiltersAndSort() {
 
 // Handle episode update
 function handleEpisodeUpdate(event) {
-    const showId = parseInt(event.target.closest('[data-show-id]').dataset.showId);
-    const action = event.target.closest('[data-action]').dataset.action;
-    
-    const show = allShows.find(s => s.id === showId);
-    if (!show) return;
-    
-    if (action === 'increase') {
-        if (show.total_episodes && show.watched_episode >= show.total_episodes) return;
-        show.watched_episode++;
+    try {
+        const showId = parseInt(event.target.closest('[data-show-id]').dataset.showId);
+        const action = event.target.closest('[data-action]').dataset.action;
         
-        // Auto-complete if reached total episodes
-        if (show.total_episodes && show.watched_episode >= show.total_episodes) {
-            show.status = 'Completed';
-        }
-    } else if (action === 'decrease') {
-        if (show.watched_episode <= 0) return;
-        show.watched_episode--;
+        const show = allShows.find(s => s.id === showId);
+        if (!show) return;
         
-        // Change status back from completed if going below total
-        if (show.status === 'Completed' && show.watched_episode < show.total_episodes) {
-            show.status = 'Watching';
+        if (action === 'increase') {
+            if (show.total_episodes && show.watched_episode >= show.total_episodes) return;
+            show.watched_episode++;
+            
+            // Auto-complete if reached total episodes
+            if (show.total_episodes && show.watched_episode >= show.total_episodes) {
+                show.status = 'Completed';
+            }
+        } else if (action === 'decrease') {
+            if (show.watched_episode <= 0) return;
+            show.watched_episode--;
+            
+            // Change status back from completed if going below total
+            if (show.status === 'Completed' && show.watched_episode < show.total_episodes) {
+                show.status = 'Watching';
+            }
         }
+        
+        // Update progress
+        if (show.total_episodes > 0) {
+            show.progress = Math.round((show.watched_episode / show.total_episodes) * 100);
+        }
+        
+        saveUserModification(show);
+        displayShows();
+        updateStatistics();
+    } catch (error) {
+        console.warn('Episode update error suppressed:', error);
     }
-    
-    // Update progress
-    if (show.total_episodes > 0) {
-        show.progress = Math.round((show.watched_episode / show.total_episodes) * 100);
-    }
-    
-    saveUserModification(show);
-    displayShows();
-    updateStatistics();
 }
 
 // Handle rating update
 function handleRatingUpdate(event) {
-    const rating = parseInt(event.target.dataset.rating);
-    const showId = parseInt(event.target.closest('[data-show-id]').dataset.showId);
-    
-    const show = allShows.find(s => s.id === showId);
-    if (!show) return;
-    
-    show.rating = rating;
-    
-    saveUserModification(show);
-    displayShows();
+    try {
+        const rating = parseInt(event.target.dataset.rating);
+        const showId = parseInt(event.target.closest('[data-show-id]').dataset.showId);
+        
+        const show = allShows.find(s => s.id === showId);
+        if (!show) return;
+        
+        show.rating = rating;
+        
+        saveUserModification(show);
+        displayShows();
+    } catch (error) {
+        console.warn('Rating update error suppressed:', error);
+    }
 }
 
 // Handle status updates
 function handleStatusUpdate(e) {
-    const dropdown = e.target;
-    const showCard = dropdown.closest('.show-card');
-    const showId = parseInt(showCard.dataset.showId);
-    const newStatus = dropdown.value;
-    
-    // Find the show in our data
-    const show = allShows.find(s => s.id === showId);
-    if (show) {
-        // Update the data
-        show.status = newStatus;
+    try {
+        const dropdown = e.target;
+        const showCard = dropdown.closest('.show-card');
+        const showId = parseInt(showCard.dataset.showId);
+        const newStatus = dropdown.value;
         
-        // Save modifications
-        saveUserModification(show);
-        
-        // Update the show card styling to reflect new status
-        showCard.className = `show-card status-${newStatus.toLowerCase().replace(/[^a-z0-9]/g, '-')}`;
-        
-        // Show notification
-        showNotification(`Updated "${show.show}" status to "${newStatus}"`);
-        
-        // Refresh display to update analytics
-        displayShows();
+        // Find the show in our data
+        const show = allShows.find(s => s.id === showId);
+        if (show) {
+            // Update the data
+            show.status = newStatus;
+            
+            // Save modifications
+            saveUserModification(show);
+            
+            // Update the show card styling to reflect new status
+            showCard.className = `show-card status-${newStatus.toLowerCase().replace(/[^a-z0-9]/g, '-')}`;
+            
+            // Show notification
+            showNotification(`Updated "${show.show}" status to "${newStatus}"`);
+            
+            // Refresh display to update analytics
+            displayShows();
+        }
+    } catch (error) {
+        console.warn('Status update error suppressed:', error);
     }
 }
 
 // Save user modification to localStorage
 function saveUserModification(show) {
-    const userModifications = JSON.parse(localStorage.getItem('userModifications') || '{}');
-    userModifications[show.id] = {
-        watched_episode: show.watched_episode,
-        status: show.status,
-        rating: show.rating,
-        progress: show.progress
-    };
-    localStorage.setItem('userModifications', JSON.stringify(userModifications));
+    try {
+        const userModifications = JSON.parse(localStorage.getItem('userModifications') || '{}');
+        userModifications[show.id] = {
+            watched_episode: show.watched_episode,
+            status: show.status,
+            rating: show.rating,
+            progress: show.progress
+        };
+        localStorage.setItem('userModifications', JSON.stringify(userModifications));
+    } catch (error) {
+        console.warn('LocalStorage save error suppressed:', error);
+        showNotification('Failed to save changes. Please check your browser settings.', 'error');
+    }
 }
 
 // Handle view toggle
