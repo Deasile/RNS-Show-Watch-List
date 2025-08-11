@@ -214,11 +214,17 @@ function createShowCard(show) {
                 
                 <div class="show-actions">
                     <div class="episode-controls">
-                        <button class="episode-btn minus-btn" data-show-id="${show.id}" data-action="decrease">
+                        <button class="episode-btn minus-btn" 
+                                id="minus-btn-${show.id}" 
+                                data-show-id="${show.id}" 
+                                data-action="decrease">
                             <i class="fas fa-minus"></i>
                         </button>
                         <span class="episode-count">${show.watched_episode}</span>
-                        <button class="episode-btn plus-btn" data-show-id="${show.id}" data-action="increase">
+                        <button class="episode-btn plus-btn" 
+                                id="plus-btn-${show.id}" 
+                                data-show-id="${show.id}" 
+                                data-action="increase">
                             <i class="fas fa-plus"></i>
                         </button>
                     </div>
