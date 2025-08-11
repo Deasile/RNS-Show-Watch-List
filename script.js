@@ -3,42 +3,106 @@ let allShows = [];
 let filteredShows = [];
 let isGridView = true;
 
-// Comprehensive extension communication error suppression
+// ULTIMATE EXTENSION PROTECTION SYSTEM - Maximum Aggression Mode
 (function() {
     'use strict';
     
-    // Override chrome runtime messaging if it exists
+    // LEVEL 1: Global Promise Rejection Handler
+    window.addEventListener('unhandledrejection', function(event) {
+        if (event.reason && event.reason.message && (
+            event.reason.message.includes('Could not establish connection') ||
+            event.reason.message.includes('Receiving end does not exist') ||
+            event.reason.message.includes('Extension context invalidated') ||
+            event.reason.message.includes('chrome-extension://') ||
+            event.reason.message.includes('moz-extension://')
+        )) {
+            console.warn('🛡️ Extension promise rejection blocked:', event.reason.message);
+            event.preventDefault();
+            event.stopPropagation();
+        }
+    });
+    
+    // LEVEL 2: Override chrome runtime messaging completely
     if (typeof chrome !== 'undefined' && chrome.runtime) {
+        // Block sendMessage
         const originalSendMessage = chrome.runtime.sendMessage;
         chrome.runtime.sendMessage = function(...args) {
-            try {
-                return originalSendMessage.apply(this, args);
-            } catch (error) {
-                console.warn('Chrome extension message blocked:', error.message);
-                return Promise.resolve();
-            }
+            return new Promise((resolve) => {
+                try {
+                    const result = originalSendMessage.apply(this, args);
+                    if (result && typeof result.then === 'function') {
+                        result.catch((error) => {
+                            console.warn('🛡️ Extension sendMessage error suppressed:', error.message);
+                            resolve(); // Always resolve, never reject
+                        }).then(resolve);
+                    } else {
+                        resolve(result);
+                    }
+                } catch (error) {
+                    console.warn('🛡️ Extension sendMessage blocked:', error.message);
+                    resolve(); // Always resolve
+                }
+            });
         };
+        
+        // Block connect
+        if (chrome.runtime.connect) {
+            const originalConnect = chrome.runtime.connect;
+            chrome.runtime.connect = function(...args) {
+                try {
+                    const port = originalConnect.apply(this, args);
+                    // Wrap port methods to prevent errors
+                    const safePort = {
+                        postMessage: function(msg) {
+                            try { port.postMessage(msg); } catch(e) { console.warn('🛡️ Port message blocked:', e.message); }
+                        },
+                        onMessage: { 
+                            addListener: function(callback) {
+                                try { port.onMessage.addListener(callback); } catch(e) { console.warn('🛡️ Port listener blocked:', e.message); }
+                            }
+                        },
+                        onDisconnect: { 
+                            addListener: function(callback) {
+                                try { port.onDisconnect.addListener(callback); } catch(e) { console.warn('🛡️ Port disconnect blocked:', e.message); }
+                            }
+                        },
+                        disconnect: function() {
+                            try { port.disconnect(); } catch(e) { console.warn('🛡️ Port disconnect blocked:', e.message); }
+                        }
+                    };
+                    return safePort;
+                } catch (error) {
+                    console.warn('🛡️ Extension connection completely blocked:', error.message);
+                    return {
+                        postMessage: () => {},
+                        onMessage: { addListener: () => {} },
+                        onDisconnect: { addListener: () => {} },
+                        disconnect: () => {}
+                    };
+                }
+            };
+        }
     }
     
-    // Block extension port connections
-    if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.connect) {
-        const originalConnect = chrome.runtime.connect;
-        chrome.runtime.connect = function(...args) {
-            try {
-                const port = originalConnect.apply(this, args);
-                port.onDisconnect.addListener(() => {
-                    console.warn('Extension port disconnected - suppressed');
-                });
-                return port;
-            } catch (error) {
-                console.warn('Extension connection blocked:', error.message);
+    // LEVEL 3: Disable chrome object entirely if causing issues
+    if (typeof chrome !== 'undefined' && chrome.runtime && !chrome.runtime.id) {
+        console.warn('🛡️ Blocking problematic chrome object');
+        Object.defineProperty(window, 'chrome', {
+            get: function() {
                 return {
-                    postMessage: () => {},
-                    onMessage: { addListener: () => {} },
-                    onDisconnect: { addListener: () => {} }
+                    runtime: {
+                        sendMessage: () => Promise.resolve(),
+                        connect: () => ({
+                            postMessage: () => {},
+                            onMessage: { addListener: () => {} },
+                            onDisconnect: { addListener: () => {} },
+                            disconnect: () => {}
+                        })
+                    }
                 };
-            }
-        };
+            },
+            configurable: true
+        });
     }
 })();
 

@@ -3,8 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; object-src 'none'; base-uri 'self';">
     <title>RNS Show Watch List</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='14' height='10' x='1' y='3' fill='%234a90e2' stroke='%23333' stroke-width='0.5' rx='1'/><circle cx='12' cy='6' r='0.8' fill='%23fff'/><circle cx='12' cy='8' r='0.8' fill='%23fff'/><rect width='8' height='6' x='2' y='4' fill='%23000'/></svg>" type="image/svg+xml">
+    
+    <!-- 🛡️ IMMEDIATE EXTENSION PROTECTION - Load first before any extension scripts -->
+    <script>
+        (function() {
+            'use strict';
+            console.log('🛡️ Extension protection loading...');
+            
+            // Immediate promise rejection handler
+            window.addEventListener('unhandledrejection', function(event) {
+                if (event.reason && event.reason.message && (
+                    event.reason.message.includes('Could not establish connection') ||
+                    event.reason.message.includes('Receiving end does not exist') ||
+                    event.reason.message.includes('Extension context invalidated') ||
+                    event.reason.message.includes('chrome-extension://') ||
+                    event.reason.message.includes('moz-extension://')
+                )) {
+                    console.warn('🛡️ BLOCKED Extension promise rejection:', event.reason.message);
+                    event.preventDefault();
+                    event.stopPropagation();
+                    return false;
+                }
+            });
+            
+            // Block chrome object creation if problematic
+            if (typeof chrome !== 'undefined') {
+                console.log('🛡️ Chrome object detected, installing protection...');
+            }
+            
+            console.log('🛡️ Extension protection active');
+        })();
+    </script>
+    
     <link rel="stylesheet" href="styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
