@@ -56,6 +56,20 @@ const averageProgress = document.getElementById('averageProgress');
 
 // Initialize the app
 document.addEventListener('DOMContentLoaded', function() {
+    // Debug: Check for label validation issues
+    setTimeout(() => {
+        const labels = document.querySelectorAll('label[for]');
+        labels.forEach(label => {
+            const forAttr = label.getAttribute('for');
+            const target = document.getElementById(forAttr);
+            if (!target) {
+                console.error(`Label validation error: Label for="${forAttr}" has no matching element with id="${forAttr}"`);
+            } else if (!['INPUT', 'SELECT', 'TEXTAREA', 'BUTTON'].includes(target.tagName)) {
+                console.error(`Label validation error: Label for="${forAttr}" points to invalid element type: ${target.tagName}`);
+            }
+        });
+    }, 1000);
+    
     loadShows();
     setupEventListeners();
     loadUserPreferences();
