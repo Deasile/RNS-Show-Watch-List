@@ -1,3 +1,522 @@
+.absolute-actions-row {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: flex-start;
+    pointer-events: auto;
+    z-index: 2;
+    padding-bottom: 12px;
+}
+.absolute-delete {
+    position: absolute;
+    left: 16px;
+    bottom: 15px;
+    z-index: 3;
+}
+.bottom-flex-controls {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: flex-start;
+    margin-left: 90px;
+    width: calc(100% - 110px);
+    gap: 16px;
+}
+.bottom-flex-controls .watch-episode-btn,
+.bottom-flex-controls .watch-episode-placeholder {
+    margin-left: 0;
+    flex-shrink: 0;
+}
+/* DISABLED - conflicts with nuclear reset */
+/*
+@media (max-width: 600px) {
+    .absolute-actions-row {
+        position: absolute;
+        left: 0px;
+        right: 0px;
+        bottom: 8px;
+        margin-bottom: 0;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        z-index: 2;
+    }
+*/
+    .absolute-delete {
+        position: absolute;
+        left: 8px;
+        bottom: 0;
+        margin: 0;
+        min-width: 36px !important;
+        width: 36px !important;
+        height: 36px !important;
+        padding: 6px !important;
+        font-size: 14px !important;
+    }
+    .absolute-delete.delete-show-btn {
+        min-width: 36px !important;
+        width: 36px !important;
+        height: 36px !important;
+        padding: 6px !important;
+        font-size: 14px !important;
+        border-radius: 6px !important;
+    }
+    /* NUCLEAR OPTION - Complete mobile delete button override */
+    @media (max-width: 600px) {
+        .absolute-delete.btn.btn-danger.delete-show-btn.compact-btn {
+            /* Reset all inherited properties */
+            all: unset !important;
+            /* Set only what we need */
+            position: absolute !important;
+            left: 8px !important;
+            bottom: 3px !important;
+            width: 36px !important;
+            height: 36px !important;
+            background: #e53e3e !important;
+            border: 1px solid #e53e3e !important;
+            border-radius: 6px !important;
+            color: white !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            cursor: pointer !important;
+            font-size: 14px !important;
+            box-sizing: border-box !important;
+        }
+        .absolute-delete.btn.btn-danger.delete-show-btn.compact-btn i {
+            width: auto !important;
+            height: auto !important;
+            line-height: 1 !important;
+            font-size: 14px !important;
+        }
+    }
+    .bottom-flex-controls {
+        margin-left: 60px;
+        width: calc(100% - 70px);
+        gap: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex: 1;
+    }
+    .compact-btn {
+        padding: 6px 10px !important;
+        font-size: 14px !important;
+        min-width: 36px !important;
+        width: 36px !important;
+        height: 36px !important;
+        border-radius: 6px !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .episode-controls.compact-controls {
+        min-width: 67px;
+        width: 67px;
+        max-width: 67px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        flex-shrink: 0;
+    }
+    .episode-controls.compact-controls .compact-btn {
+        min-width: 36px !important;
+        height: 36px !important;
+        padding: 6px 10px !important;
+        font-size: 14px !important;
+    }
+    .watch-episode-btn.compact-btn, .watch-episode-placeholder.compact-btn {
+        min-width: 80px !important;
+        height: 36px !important;
+        font-size: 14px !important;
+        padding: 6px 12px !important;
+    }
+    .compact-count {
+        min-width: 32px !important;
+        font-size: 14px !important;
+        height: 36px !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+.flex-actions-row, .left-actions-flex, .right-actions-flex, .episode-controls {
+    height: 40px;
+    display: flex;
+    align-items: center;
+}
+/* Mobile-only compact styles */
+@media (max-width: 600px) {
+    .compact-btn, .compact-controls, .compact-count, .watch-episode-btn {
+        height: 40px !important;
+        line-height: 40px !important;
+        align-items: center !important;
+        vertical-align: middle !important;
+    }
+}
+.flex-spacer {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+.flex-actions-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: auto;
+    padding-top: 15px;
+    flex-wrap: nowrap;
+    min-width: 0;
+}
+.left-actions-flex, .right-actions-flex, .episode-controls {
+    align-self: center;
+}
+/* Mobile-only compact styles */
+@media (max-width: 600px) {
+    .compact-btn, .compact-controls, .compact-count {
+        margin-top: 0 !important;
+        margin-bottom: 0 !important;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+    }
+}
+.left-actions-flex, .right-actions-flex {
+    align-self: flex-end;
+}
+.left-actions-flex, .right-actions-flex {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        min-width: 0;
+        flex-shrink: 1;
+}
+.left-actions-flex {
+        gap: 8px;
+}
+.right-actions-flex {
+        justify-content: flex-end;
+        min-width: 80px;
+}
+/* Mobile-only compact styles */
+@media (max-width: 600px) {
+    .compact-btn {
+        padding: 6px 10px !important;
+        font-size: 13px !important;
+        min-width: 36px !important;
+        width: 36px !important;
+        height: 36px !important;
+        border-radius: 6px !important;
+        touch-action: manipulation;
+    }
+}
+/* Mobile-only compact styles */
+@media (max-width: 600px) {
+    .episode-controls.compact-controls {
+        min-width: 67px;
+        width: 67px;
+        max-width: 67px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        position: relative;
+        bottom: 0;
+        flex-shrink: 0;
+    }
+    .watch-episode-btn.compact-btn, .watch-episode-placeholder.compact-btn {
+        min-width: 36px;
+        width: 130%;
+        height: 36px;
+    }
+}
+/* DISABLED - second conflicting mobile rule */
+/*
+@media (max-width: 600px) {
+                .absolute-actions-row {
+                    position: absolute;
+                    left: 0;
+                    right: 0;
+                    bottom: 12px;
+                    padding-bottom: 0;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    width: 100%;
+                    z-index: 2;
+                }
+            .absolute-delete {
+                left: 4px;
+                bottom: 6px;
+            }
+            .bottom-flex-controls {
+                margin-left: 50px;
+                width: calc(100% - 60px);
+                gap: 16px;
+            }
+            .compact-btn {
+                padding: 3px 5px !important;
+                font-size: 10px !important;
+                min-width: 18px !important;
+                height: 22px !important;
+                border-radius: 3px !important;
+            }
+            .episode-controls.compact-controls {
+                min-width: 23.4px;
+                width: 130%;
+                height: 22px;
+                display: flex;
+                align-items: center;
+                position: relative;
+                bottom: 0;
+            }
+            .watch-episode-btn.compact-btn, .watch-episode-placeholder.compact-btn {
+                min-width: 23.4px;
+                width: 130%;
+                height: 22px;
+            }
+            .compact-count {
+                min-width: 14px !important;
+                font-size: 10px !important;
+            }
+}
+*/
+/* Mobile-only compact styles */
+@media (max-width: 600px) {
+    .compact-controls {
+            gap: 6px !important;
+    }
+    .compact-count {
+            min-width: 28px !important;
+            font-size: 14px !important;
+    }
+    .watch-episode-placeholder.compact-btn {
+            display: inline-block;
+            min-width: 80px;
+            height: 32px;
+    }
+}
+@media (max-width: 600px) {
+    .flex-actions-row {
+        flex-direction: row;
+        flex-wrap: nowrap;
+        gap: 2px;
+        padding-top: 8px;
+        min-width: 0;
+    }
+    .left-actions-flex, .right-actions-flex {
+        min-width: 0;
+        flex-shrink: 1;
+    }
+    .compact-btn {
+        padding: 4px 6px !important;
+        font-size: 11px !important;
+        min-width: 20px !important;
+        height: 36px !important;
+        border-radius: 4px !important;
+    }
+    .compact-controls {
+        gap: 2px !important;
+    }
+    .compact-count {
+        min-width: 18px !important;
+        font-size: 11px !important;
+    }
+    .watch-episode-placeholder.compact-btn {
+        min-width: 50px;
+        height: 36px;
+    }
+    .btn-secondary.watch-episode-btn.compact-btn {
+        font-size: 11px !important;
+        padding: 4px 6px !important;
+        min-width: 36px !important;
+        width: 36px !important;
+        height: 36px !important;
+    }
+}
+@media (max-width: 600px) {
+    .flex-actions-row {
+        flex-direction: row;
+        flex-wrap: nowrap;
+        gap: 4px;
+        padding-top: 8px;
+        overflow-x: auto;
+        min-width: 0;
+    }
+    .left-actions-flex, .right-actions-flex {
+        min-width: 0;
+    }
+    .compact-btn {
+        padding: 4px 6px !important;
+        font-size: 11px !important;
+        min-width: 20px !important;
+        height: 36px !important;
+        border-radius: 4px !important;
+    }
+    .compact-controls {
+        gap: 2px !important;
+    }
+    .compact-count {
+        min-width: 18px !important;
+        font-size: 11px !important;
+    }
+    .watch-episode-placeholder.compact-btn {
+        min-width: 60px;
+        height: 36px;
+    }
+    .btn-secondary.watch-episode-btn.compact-btn {
+        font-size: 11px !important;
+        padding: 4px 6px !important;
+        min-width: 36px !important;
+        width: 36px !important;
+        height: 36px !important;
+    }
+}
+@media (max-width: 600px) {
+    .flex-actions-row {
+        flex-direction: row;
+        flex-wrap: nowrap;
+        gap: 4px;
+        padding-top: 8px;
+    }
+    .left-actions-flex {
+        gap: 4px;
+    }
+    .right-actions-flex {
+        min-width: 90px;
+    }
+    .compact-btn {
+        padding: 4px 8px !important;
+        font-size: 12px !important;
+        min-width: 24px !important;
+        height: 28px !important;
+        border-radius: 5px !important;
+    }
+    .compact-controls {
+        gap: 4px !important;
+    }
+    .compact-count {
+        min-width: 24px !important;
+        font-size: 12px !important;
+    }
+    .watch-episode-placeholder.compact-btn {
+        min-width: 80px;
+        height: 28px;
+    }
+    .btn-secondary.watch-episode-btn.compact-btn {
+        font-size: 12px !important;
+        padding: 4px 8px !important;
+        min-width: 36px !important;
+        width: 36px !important;
+        height: 36px !important;
+    }
+}
+.flex-actions-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: auto;
+    padding-top: 15px;
+}
+.left-actions-flex {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+}
+.right-actions-flex {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    min-width: 140px;
+}
+/* Mobile-only compact styles */
+@media (max-width: 600px) {
+    .compact-btn {
+        padding: 6px 12px !important;
+        font-size: 13px !important;
+        min-width: 32px !important;
+        height: 32px !important;
+        border-radius: 6px !important;
+    }
+    .compact-controls {
+        gap: 6px !important;
+    }
+    .compact-count {
+        min-width: 32px !important;
+        font-size: 14px !important;
+    }
+    .watch-episode-placeholder.compact-btn {
+        display: inline-block;
+        min-width: 120px;
+        height: 32px;
+    }
+}
+.grid-actions-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    align-items: end;
+    width: 100%;
+    margin-top: auto;
+    padding-top: 15px;
+    gap: 0;
+}
+.actions-col {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.actions-left {
+    justify-content: flex-start;
+}
+.actions-center {
+    justify-content: center;
+}
+.actions-right {
+    justify-content: flex-end;
+}
+.watch-episode-placeholder {
+    display: inline-block;
+    min-width: 160px;
+    height: 44px;
+}
+.right-actions-group {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    min-width: 180px;
+}
+
+.watch-episode-placeholder {
+    display: inline-block;
+    min-width: 160px;
+    height: 44px;
+}
+.bottom-actions-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: auto;
+    padding-top: 15px;
+}
+
+.left-actions-group {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 16px;
+}
 /* Reset and Base Styles */
 * {
     margin: 0;
@@ -11,12 +530,16 @@ body {
     min-height: 100vh;
     color: #333;
     line-height: 1.6;
+    /* Prevent horizontal scroll on mobile */
+    overflow-x: hidden;
 }
 
 .container {
     max-width: 1400px;
     margin: 0 auto;
     padding: 20px;
+    /* Ensure container doesn't overflow */
+    width: 100%;
 }
 
 /* Header */
@@ -52,10 +575,16 @@ body {
     grid-template-columns: 1fr auto auto;
     gap: 20px;
     align-items: center;
+    /* Prevent overflow */
+    width: 100%;
+    overflow: hidden;
 }
 
 .search-container {
     position: relative;
+    /* Ensure it doesn't overflow */
+    width: 100%;
+    min-width: 0;
 }
 
 .search-container i {
@@ -73,6 +602,9 @@ body {
     border-radius: 25px;
     font-size: 16px;
     transition: all 0.3s ease;
+    /* Prevent zoom on iOS and ensure proper sizing */
+    min-width: 0;
+    max-width: 100%;
 }
 
 .search-input:focus {
@@ -141,6 +673,19 @@ body {
     background: #e9ecef;
 }
 
+.btn-tertiary {
+    background: transparent;
+    border: 1px solid #6c757d;
+    color: #6c757d;
+    font-size: 0.8em;
+    padding: 4px 8px;
+}
+
+.btn-tertiary:hover {
+    background: #6c757d;
+    color: white;
+}
+
 /* Stats */
 /* Enhanced Statistics */
 .stats {
@@ -204,58 +749,69 @@ body {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
     gap: 25px;
+    grid-auto-rows: 1fr; /* This makes all grid items the same height */
 }
 
 /* List View Layout */
 .show-list.list-view {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
 }
 
 .show-list.list-view .show-card {
     display: flex;
     flex-direction: row;
     align-items: center;
-    padding: 15px 20px;
+    padding: 12px 16px;
     max-width: none;
+    border-radius: 8px;
+    min-height: 80px;
 }
 
 .show-list.list-view .show-header {
-    flex: 1;
+    flex: 0 0 200px;
     margin-bottom: 0;
-    margin-right: 20px;
+    margin-right: 16px;
+}
+
+.show-list.list-view .show-header h3 {
+    font-size: 1.1em;
+    margin-bottom: 4px;
 }
 
 .show-list.list-view .show-body {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 16px;
     padding: 0;
-    flex: 2;
+    flex: 1;
 }
 
 .show-list.list-view .show-progress {
     margin: 0;
-    min-width: 200px;
+    flex: 0 0 150px;
 }
 
 .show-list.list-view .show-rating {
-    min-width: 120px;
+    flex: 0 0 100px;
 }
 
 .show-list.list-view .show-actions {
-    min-width: 150px;
+    flex: 0 0 120px;
     justify-content: flex-end;
 }
 
 .show-card {
     background: white;
     border-radius: 15px;
-    overflow: hidden;
+    overflow: visible;
     box-shadow: 0 10px 30px rgba(0,0,0,0.1);
     transition: all 0.3s ease;
     position: relative;
+    min-height: 400px; /* Minimal uniform height without disrupting internal layout */
+    display: flex;
+    flex-direction: column;
 }
 
 .show-card:hover {
@@ -736,6 +1292,9 @@ body {
 
 .show-body {
     padding: 20px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1; /* This makes the body grow to fill available space */
 }
 
 .show-progress {
@@ -784,17 +1343,126 @@ body {
     transform: scale(1.2);
 }
 
+
 .show-actions {
     display: flex;
     gap: 10px;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
+    padding-top: 15px;
+    margin-top: auto;
+}
+
+/* Ensure unified-actions-row aligns episode controls and watch button consistently */
+.unified-actions-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 16px;
+    justify-content: space-between;
+    width: 100%;
+}
+
+/* PC/Desktop watch button - nuclear reset approach */
+@media (min-width: 601px) {
+    .watch-episode-btn {
+        all: unset !important;
+        /* Complete reset, then rebuild */
+        position: relative !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        
+        /* Size and spacing */
+        min-width: 160px !important;
+        width: auto !important;
+        height: 36px !important;
+        
+        /* Appearance */
+        background: #f8f9fa !important;
+        color: #333 !important;
+        border: 2px solid #e1e5e9 !important;
+        border-radius: 6px !important;
+        padding: 6px 12px !important;
+        font-size: 13px !important;
+        font-weight: 600 !important;
+        text-decoration: none !important;
+        cursor: pointer !important;
+        
+        /* Push to right side of card */
+        margin-left: auto !important;
+        margin-top: 0 !important;
+        margin-bottom: 0 !important;
+        margin-right: 8px !important;
+        
+        /* Prevent inheritance issues */
+        flex-shrink: 0 !important;
+        flex-grow: 0 !important;
+        flex-basis: auto !important;
+        box-sizing: border-box !important;
+        
+        /* Ensure it's not clipped */
+        overflow: visible !important;
+        z-index: 10 !important;
+    }
+    
+    /* PC Episode count button */
+    .episode-count {
+        all: unset !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        min-width: 67px !important;
+        width: auto !important;
+        height: 36px !important;
+        background: #e8f4f8 !important;
+        color: #333 !important;
+        border: 2px solid #bee5eb !important;
+        border-radius: 6px !important;
+        padding: 6px 12px !important;
+        font-size: 13px !important;
+        font-weight: 600 !important;
+        margin-left: auto !important;
+        margin-right: 8px !important;
+        box-sizing: border-box !important;
+        cursor: pointer !important;
+        z-index: 10 !important;
+    }
+    
+    /* PC Episode buttons */
+    .episode-btn {
+        all: unset !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 36px !important;
+        height: 36px !important;
+        background: #f8f9fa !important;
+        color: #333 !important;
+        border: 2px solid #dee2e6 !important;
+        border-radius: 50% !important;
+        font-size: 13px !important;
+        font-weight: 600 !important;
+        margin-left: auto !important;
+        margin-right: 8px !important;
+        box-sizing: border-box !important;
+        cursor: pointer !important;
+        z-index: 10 !important;
+    }
 }
 
 .episode-controls {
     display: flex;
     align-items: center;
     gap: 10px;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
 }
 
 .episode-btn {
@@ -823,6 +1491,67 @@ body {
     text-align: center;
 }
 
+/* Delete button specific styling */
+.delete-show-btn {
+    background: #fff5f5 !important;
+    border: 1px solid #fed7d7 !important;
+    color: #e53e3e !important;
+    padding: 8px 12px !important;
+    border-radius: 6px !important;
+    font-size: 0.9em !important;
+    transition: all 0.3s ease !important;
+    min-width: auto !important;
+}
+
+.delete-show-btn:hover {
+    background: #e53e3e !important;
+    color: white !important;
+    border-color: #e53e3e !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(229, 62, 62, 0.3) !important;
+}
+
+.delete-show-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(229, 62, 62, 0.3) !important;
+}
+
+/* Confirmation modal specific styling */
+.warning-box {
+    background: #fff3cd;
+    border: 1px solid #ffeaa7;
+    padding: 10px;
+    border-radius: 4px;
+    margin: 15px 0;
+}
+
+.show-details {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    margin: 15px 0;
+}
+
+.modal-footer {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    align-items: center;
+    padding-top: 15px;
+    border-top: 1px solid #dee2e6;
+}
+
+.btn-danger {
+    background: #e53e3e;
+    border: 1px solid #e53e3e;
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #c53030;
+    border-color: #c53030;
+}
+
 /* Modal */
 .modal {
     display: none;
@@ -836,6 +1565,22 @@ body {
     backdrop-filter: blur(5px);
 }
 
+.modal.active {
+    display: block !important;
+    animation: modalFadeIn 0.3s ease-out;
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
 .modal-content {
     background-color: white;
     margin: 5% auto;
@@ -846,6 +1591,51 @@ body {
     max-height: 90vh;
     overflow-y: auto;
     box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+
+.modal-content.large-modal {
+    max-width: 800px;
+    width: 95%;
+}
+
+.import-methods {
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.import-method {
+    margin-bottom: 20px;
+    padding: 15px;
+    border: 1px solid #e1e5e9;
+    border-radius: 8px;
+    background: #f8f9fa;
+}
+
+.import-method h3 {
+    margin-top: 0;
+    color: var(--primary);
+    font-size: 1.1em;
+}
+
+.import-method p {
+    margin: 8px 0;
+    color: #666;
+    font-size: 0.9em;
+}
+
+.import-method input,
+.import-method textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin: 5px 0;
+    font-family: inherit;
+    box-sizing: border-box;
+}
+
+.import-method button {
+    margin: 5px 0;
 }
 
 .modal-header {
@@ -906,6 +1696,14 @@ body {
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
+.form-help {
+    font-size: 12px;
+    color: #666;
+    margin-top: 4px;
+    display: block;
+    line-height: 1.4;
+}
+
 .form-actions {
     display: flex;
     gap: 15px;
@@ -939,7 +1737,7 @@ body {
 /* Responsive Design */
 @media (max-width: 768px) {
     .container {
-        padding: 15px;
+        padding: 10px;
     }
 
     .header h1 {
@@ -949,37 +1747,195 @@ body {
     .controls {
         grid-template-columns: 1fr;
         gap: 15px;
+        padding: 15px;
+    }
+
+    .search-container {
+        order: 1;
     }
 
     .filters {
+        order: 2;
         justify-content: center;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .filters select {
+        min-width: 120px;
+        flex: 1;
     }
 
     .export-buttons {
+        order: 3;
         justify-content: center;
+        flex-wrap: wrap;
+        gap: 10px;
     }
 
-    .show-list {
+    .export-buttons .btn {
+        flex: 1;
+        min-width: 120px;
+    }
+
+    /* Mobile Grid View - Keep as grid but single column */
+    .show-list:not(.list-view) {
         grid-template-columns: 1fr;
-        gap: 20px;
+        gap: 15px;
+    }
+
+    /* Mobile List View - Remove grid completely */
+    .show-list.list-view {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
     }
 
     .stats {
         grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+        margin-bottom: 15px;
+    }
+
+    .stat-card {
+        padding: 8px 10px;
+        border-radius: 8px;
+        text-align: center;
+        min-height: auto;
+    }
+
+    .stat-icon {
+        font-size: 1.2em;
+        margin-bottom: 4px;
+    }
+
+    .stat-number {
+        font-size: 1.3em;
+        font-weight: bold;
+        margin-bottom: 2px;
+    }
+
+    .stat-label {
+        font-size: 0.8em;
+        opacity: 0.8;
+        line-height: 1;
     }
 
     .floating-btn {
         bottom: 20px;
-        right: 20px;
+        right: 15px;
         width: 50px;
         height: 50px;
         font-size: 20px;
     }
+
+    /* Better mobile search */
+    .search-input {
+        font-size: 16px; /* Prevents zoom on iOS */
+        padding: 15px 15px 15px 45px;
+    }
+
+    /* Mobile-friendly buttons */
+    .btn {
+        padding: 12px 16px;
+        font-size: 14px;
+        min-height: 44px; /* Touch-friendly */
+    }
+
+    /* Mobile List View - Completely different layout */
+    .show-list.list-view {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 8px !important;
+    }
+
+    .show-list.list-view .show-card {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        padding: 8px 12px !important;
+        border-radius: 8px !important;
+        min-height: 60px !important;
+        background: #f8f9fa !important;
+        border-left: 4px solid #007bff !important;
+    }
+
+    .show-list.list-view .show-header {
+        flex: 1 !important;
+        margin: 0 8px 0 0 !important;
+    }
+
+    .show-list.list-view .show-header h3 {
+        font-size: 0.9em !important;
+        margin: 0 !important;
+        color: #333 !important;
+    }
+
+    .show-list.list-view .show-body {
+        display: none !important; /* Hide detailed info in mobile list view */
+    }
+
+    .show-list.list-view .show-actions {
+        flex: 0 0 auto !important;
+        margin: 0 !important;
+        display: flex !important;
+        gap: 4px !important;
+    }
+
+    .show-list.list-view .show-actions .btn {
+        padding: 4px 8px !important;
+        font-size: 0.8em !important;
+        min-width: auto !important;
+    }
 }
 
 @media (max-width: 480px) {
+    .container {
+        padding: 8px;
+    }
+
+    .header h1 {
+        font-size: 1.8em;
+    }
+
+    .controls {
+        padding: 12px;
+    }
+
     .stats {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px;
+        margin-bottom: 12px;
+    }
+
+    .stat-card {
+        padding: 6px 8px;
+        border-radius: 6px;
+        min-height: auto;
+    }
+
+    .stat-icon {
+        font-size: 1em;
+        margin-bottom: 2px;
+    }
+
+    .stat-number {
+        font-size: 1.1em;
+        font-weight: bold;
+        margin-bottom: 1px;
+        line-height: 1;
+    }
+
+    .stat-label {
+        font-size: 0.7em;
+        opacity: 0.8;
+        line-height: 1;
+    }
+
+    /* Hide some stats on very small screens to save space */
+    .stat-card:nth-child(4),
+    .stat-card:nth-child(5) {
+        display: none;
     }
 
     .show-actions {
@@ -990,6 +1946,148 @@ body {
 
     .episode-controls {
         justify-content: center;
+    }
+
+    /* Keep grid view as grid on ultra-small screens */
+    .show-list:not(.list-view) {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .show-list:not(.list-view) .show-card {
+        display: block; /* Ensure normal card layout */
+    }
+
+    /* Ultra-small screen list view - compact horizontal layout */
+    .show-list.list-view {
+        display: flex !important;
+        flex-direction: column !important;
+    }
+
+    .show-list.list-view .show-card {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        padding: 6px 10px !important;
+        min-height: 50px !important;
+        background: #f1f3f4 !important;
+        border-left: 3px solid #28a745 !important;
+        border-radius: 6px !important;
+    }
+
+    .show-list.list-view .show-header {
+        flex: 1 !important;
+        margin: 0 !important;
+    }
+
+    .show-list.list-view .show-header h3 {
+        font-size: 0.85em !important;
+        margin: 0 !important;
+        line-height: 1.2 !important;
+    }
+
+    .show-list.list-view .show-body {
+        display: none !important;
+    }
+
+    .show-list.list-view .show-actions {
+        display: flex !important;
+        flex-direction: row !important;
+        justify-content: flex-end !important;
+        gap: 4px !important;
+        margin: 0 !important;
+        flex: 0 0 auto !important;
+    }
+
+    .show-list.list-view .show-actions .btn {
+        padding: 3px 6px !important;
+        font-size: 0.7em !important;
+        min-width: auto !important;
+        border-radius: 4px !important;
+    }
+
+    .filters {
+        flex-direction: column;
+    }
+
+    .filters select {
+        width: 100%;
+        min-width: unset;
+    }
+
+    .export-buttons {
+        flex-direction: column;
+    }
+
+    .export-buttons .btn {
+        width: 100%;
+        min-width: unset;
+    }
+
+    /* Ultra-mobile optimizations */
+    .floating-btn {
+        right: 10px;
+        bottom: 15px;
+        width: 45px;
+        height: 45px;
+        font-size: 18px;
+    }
+}
+
+/* CLEAN CSS GRID FOR MOBILE - NO CONFLICTING RULES */
+@media (max-width: 480px) {
+    /* RESET STATS CONTAINER COMPLETELY */
+    .stats {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        grid-template-rows: auto auto auto !important;
+        gap: 8px !important;
+        margin-bottom: 15px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+    
+    /* EXPLICIT GRID POSITIONING - NO INHERITANCE CONFLICTS */
+    .stats .stat-card {
+        box-sizing: border-box !important;
+        padding: 8px !important;
+        margin: 0 !important;
+        width: auto !important;
+        display: block !important;
+    }
+    
+    /* ROW 1: TOTAL SHOWS SPANS 2 COLUMNS */
+    .stats .stat-card:nth-child(1) {
+        grid-column: 1 / 3 !important;
+        grid-row: 1 !important;
+    }
+    
+    /* ROW 2: WATCHING | WATCH TIME */
+    .stats .stat-card:nth-child(2) {
+        grid-column: 1 !important;
+        grid-row: 2 !important;
+    }
+    
+    .stats .stat-card:nth-child(3) {
+        grid-column: 2 !important;
+        grid-row: 2 !important;
+    }
+    
+    /* ROW 3: COMPLETED | AVG PROGRESS */
+    .stats .stat-card:nth-child(4) {
+        grid-column: 1 !important;
+        grid-row: 3 !important;
+    }
+    
+    .stats .stat-card:nth-child(5) {
+        grid-column: 2 !important;
+        grid-row: 3 !important;
+    }
+    
+    /* HIDE EXTRA CARDS */
+    .stats .stat-card:nth-child(n+6) {
+        display: none !important;
     }
 }
 
@@ -1036,4 +2134,53 @@ body {
 .empty-state p {
     opacity: 0.8;
     margin-bottom: 30px;
+}
+
+/* Import Options Toggle */
+.import-options {
+    background: #e8f4fd;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #b3d9f7;
+    margin-bottom: 10px;
+}
+
+.import-option-toggle {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-weight: 500;
+    color: #2c5aa0;
+}
+
+.import-option-toggle input[type="checkbox"] {
+    width: auto;
+    margin-right: 10px;
+    transform: scale(1.2);
+}
+
+.import-preview {
+    margin-top: 15px;
+    margin-bottom: 15px;
+    padding: 15px;
+    background: #fff3cd;
+    border: 1px solid #ffeaa7;
+    border-radius: 8px;
+    color: #856404;
+    max-height: 300px;
+    overflow-y: auto;
+    clear: both;
+    position: relative;
+    z-index: 1;
+}
+
+.import-preview i {
+    margin-right: 8px;
+    color: #ffc107;
+}
+
+.import-preview button {
+    margin-top: 15px;
+    display: block;
+    clear: both;
 }

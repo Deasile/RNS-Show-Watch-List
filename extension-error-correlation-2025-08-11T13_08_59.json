@@ -1,0 +1,94 @@
+{
+  "userActions": [
+    {
+      "timestamp": "2025-08-11T13:08:50.880Z",
+      "type": "user_action",
+      "action": "TEST_SHOW_CLICK",
+      "details": "Simulated show interaction"
+    },
+    {
+      "timestamp": "2025-08-11T13:08:50.891Z",
+      "type": "user_action",
+      "action": "BUTTON_CLICK",
+      "details": "Clicked: 🎮 Test Show Click"
+    },
+    {
+      "timestamp": "2025-08-11T13:08:50.995Z",
+      "type": "user_action",
+      "action": "SHOW_ELEMENT_CLICKED",
+      "details": "Rating star or status dropdown"
+    },
+    {
+      "timestamp": "2025-08-11T13:08:51.662Z",
+      "type": "user_action",
+      "action": "VIEW_TOGGLE",
+      "details": "Grid ↔ List view switch"
+    },
+    {
+      "timestamp": "2025-08-11T13:08:51.662Z",
+      "type": "user_action",
+      "action": "BUTTON_CLICK",
+      "details": "Clicked: 👁️ Test View Toggle"
+    },
+    {
+      "timestamp": "2025-08-11T13:08:52.232Z",
+      "type": "user_action",
+      "action": "STATUS_CHANGE",
+      "details": "Show status dropdown modified"
+    },
+    {
+      "timestamp": "2025-08-11T13:08:52.232Z",
+      "type": "user_action",
+      "action": "BUTTON_CLICK",
+      "details": "Clicked: 📊 Test Status Change"
+    },
+    {
+      "timestamp": "2025-08-11T13:08:54.106Z",
+      "type": "user_action",
+      "action": "TEST_ERROR_TRIGGER",
+      "details": "Manual test error trigger"
+    },
+    {
+      "timestamp": "2025-08-11T13:08:54.106Z",
+      "type": "user_action",
+      "action": "BUTTON_CLICK",
+      "details": "Clicked: 🧪 Trigger Test Error"
+    }
+  ],
+  "extensionErrors": [
+    {
+      "timestamp": "2025-08-11T13:08:54.318Z",
+      "type": "extension_error",
+      "error": "Error: Could not establish connection. Receiving end does not exist.",
+      "stack": "Error: Could not establish connection. Receiving end does not exist.\n    at http://localhost:8006/correlation_test.html:232:35"
+    }
+  ],
+  "correlations": [
+    {
+      "timestamp": "2025-08-11T13:08:54.319Z",
+      "userAction": {
+        "timestamp": "2025-08-11T13:08:54.106Z",
+        "type": "user_action",
+        "action": "BUTTON_CLICK",
+        "details": "Clicked: 🧪 Trigger Test Error"
+      },
+      "extensionErrors": [
+        {
+          "timestamp": "2025-08-11T13:08:54.318Z",
+          "type": "extension_error",
+          "error": "Error: Could not establish connection. Receiving end does not exist.",
+          "stack": "Error: Could not establish connection. Receiving end does not exist.\n    at http://localhost:8006/correlation_test.html:232:35"
+        }
+      ],
+      "timeDiff": [
+        212
+      ]
+    }
+  ],
+  "summary": {
+    "totalUserActions": 9,
+    "totalExtensionErrors": 1,
+    "totalCorrelations": 1,
+    "correlationRate": 11.11111111111111
+  }
+}

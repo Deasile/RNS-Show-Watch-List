@@ -1,0 +1,8 @@
+���corrupt_header_1,��missing_col,broken_link_col,weird_data
+Corrupted Test Show 1,junk data here,https://www.wcostream.tv/playlist-cat/777777/corrupted-test-show-1-episode-1-english-dubbed,extra,noise
+Brand New Anime 2,,https://www.wcostream.tv/playlist-cat/888888/brand-new-anime-2-episode-1-english-dubbed
+,empty name test,https://www.wcostream.tv/playlist-cat/999999/empty-name-test-episode-1-english-dubbed,status
+"Quoted, Name, With Commas",some status,https://www.wcostream.tv/playlist-cat/111000/quoted-name-episode-1-english-dubbed
+Attack on Titan,watching,https://www.wcostream.tv/playlist-cat/222000/attack-on-titan-new-link-episode-1-english-dubbed,25 episodes
+Missing Link Show,completed,,12
+Test Show With Extra Commas,watching,https://www.wcostream.tv/playlist-cat/333000/test-show-episode-1-english-dubbed,extra,data,columns,here
